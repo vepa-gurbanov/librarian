@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Publisher;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -20,13 +21,25 @@ class DatabaseSeeder extends Seeder
             \App\Models\AuthAttempt::factory(25)->create(),
         ];
     }
+
+
+    public function bookFactory(): array
+    {
+        return [
+            $this->call([
+                CategorySeeder::class,
+                PublisherSeeder::class,
+                AttributeValueSeeder::class,
+            ]),
+            \App\Models\Author::factory(25)->create(),
+            \App\Models\Book::factory(200)->create(),
+        ];
+    }
+
+
     public function run(): void
     {
         $this->authFactory();
-
-        // \App\Models\User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
+        $this->bookFactory();
     }
 }
