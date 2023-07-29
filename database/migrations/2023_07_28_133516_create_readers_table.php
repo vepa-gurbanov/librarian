@@ -17,7 +17,9 @@ return new class extends Migration
             $table->foreign('document_id')->references('id')->on('documents')->nullOnDelete();
             $table->string('name');
             $table->string('phone')->unique();
+            $table->string('password');
             $table->boolean('status')->default(0);
+            $table->rememberToken();
             $table->timestamps();
         });
     }
