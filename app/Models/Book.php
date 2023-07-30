@@ -74,9 +74,10 @@ class Book extends Model
 
     public function image(): string
     {
-        return $this->image
-            ? Storage::url('books/' . $this->id . '/' . $this->image)
-            : asset('assets/img/book.jpg');
+        return asset('img/book.jpg');
+//        return $this->image
+//            ? Storage::url('books/' . $this->id . '/' . $this->image)
+//            : asset('assets/img/book.jpg');
     }
 
 

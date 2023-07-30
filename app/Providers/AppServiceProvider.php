@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\Category;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Sanctum\Sanctum;
 
@@ -24,5 +26,13 @@ class AppServiceProvider extends ServiceProvider
     {
         Paginator::useBootstrapFive();
         Model::preventLazyLoading(!app()->isProduction());
+        View::composer('*', function ($view) {
+        $categories = Category::whereDoesntHave('parent')
+            ->withCount('books')
+            ->orderByDesc('books_count')
+            ->get(['id', 'name', 'slug', 'books_count']);
+
+        return $view->with(['categories' => $categories,]);
+        });
     }
 }

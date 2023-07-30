@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -29,10 +30,9 @@ class Category extends Model
     }
 
 
-    public function books()
+    public function books(): BelongsToMany
     {
-        $this->belongsToMany(Book::class, 'book_categories')
-            ->orderByPivot('sort_order');
+        return $this->belongsToMany(Book::class, 'book_categories', 'category_id', 'book_id');
     }
 
 
