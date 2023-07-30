@@ -4,6 +4,7 @@ use App\Http\Controllers\Reader\Auth\LoginController;
 use App\Http\Controllers\Reader\Auth\RegisterController;
 use App\Http\Controllers\Reader\Auth\VerificationController;
 use App\Http\Controllers\Reader\HomeController;
+use App\Http\Controllers\Reader\ProductController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -26,3 +27,14 @@ Route::get('/0auth2/{token}', [VerificationController::class, 'create'])->name('
 Route::post('/0auth2/{token}', [VerificationController::class, 'store']);
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+Route::controller(ProductController::class)
+    ->group(function () {
+        Route::get('/products', 'index')->name('products.index');
+        Route::get('/product/create', 'create')->name('products.create');
+        Route::post('/product/store', 'store');
+        Route::get('/product/{slug}/show', 'show')->name('products.show');
+        Route::get('/product/{slug}/edit', 'edit')->name('products.edit');
+        Route::patch('/product/{slug}/update', 'update');
+        Route::delete('/product/{slug}/delete', 'delete')->name('products.delete');
+    });

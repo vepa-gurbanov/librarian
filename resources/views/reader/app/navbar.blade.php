@@ -12,10 +12,10 @@
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">Books</a>
-                    <ul class="dropdown-menu">
+                    <ul class="dropdown-menu" style="max-width: 1080px; max-height: 480px">
+                        @foreach($categories as $category)
                         <li><a class="dropdown-item" href="#">Action</a></li>
-                        <li><a class="dropdown-item" href="#">Another action</a></li>
-                        <li><a class="dropdown-item" href="#">Something else here</a></li>
+                        @endforeach
                     </ul>
                 </li>
             </ul>

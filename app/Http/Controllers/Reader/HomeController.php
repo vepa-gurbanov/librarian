@@ -14,7 +14,7 @@ class HomeController extends Controller
     {
         $top = Book::orderBy('liked', 'desc')
             ->take(10)
-            ->get(['name', 'slug', 'price', 'page', 'liked'])->debug();
+            ->get(['name', 'slug', 'price', 'page', 'liked']);
 
         $data = [
             [
