@@ -37,9 +37,17 @@ class DatabaseSeeder extends Seeder
     }
 
 
+    public function registrationFactory(): array
+    {
+        return [
+            \App\Models\Registration::factory(250)->create(),
+        ];
+    }
+
     public function run(): void
     {
         $this->authFactory();
         $this->bookFactory();
+        $this->registrationFactory();
     }
 }

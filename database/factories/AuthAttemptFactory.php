@@ -19,15 +19,14 @@ class AuthAttemptFactory extends Factory
      */
     public function definition(): array
     {
-        $createdAt = now()->subHours(mt_rand(0, 750));
-        $ip = IpAddress::where('created_at', '>=', $createdAt)->inRandomOrder()->first()->id;
-        $agent = UserAgent::where('created_at', '>=', $createdAt)->inRandomOrder()->first()->id;
+        $agent = UserAgent::inRandomOrder()->first();
+        $ip = IpAddress::where('created_at', '>=', $agent->created_at)->inRandomOrder()->first()->id;
         return [
             'ip_address_id' => $ip,
-            'user_agent_id' => $agent,
+            'user_agent_id' => $agent->id,
             'username' => $this->faker->name(),
             'event' => Arr::random(['login', 'register', 'admin']),
-            'created_at' => $createdAt,
+            'created_at' => $agent->created_at,
         ];
     }
 }
