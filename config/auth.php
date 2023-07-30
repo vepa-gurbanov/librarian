@@ -72,10 +72,10 @@ return [
             'driver' => 'eloquent',
             'model' => App\Models\User::class,
         ],
-//    'readers' => [
-//        'driver' => 'eloquent',
-//        'model' => App\Models\Reader::class,
-//    ],
+        'readers' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Reader::class,
+        ],
     ],
 
     /*
@@ -100,6 +100,12 @@ return [
     'passwords' => [
         'users' => [
             'provider' => 'users',
+            'table' => 'password_reset_tokens',
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+        'readers' => [
+            'provider' => 'readers',
             'table' => 'password_reset_tokens',
             'expire' => 60,
             'throttle' => 60,
