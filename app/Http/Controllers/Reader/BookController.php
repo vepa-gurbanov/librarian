@@ -44,8 +44,8 @@ class BookController extends Controller
         $f_categories = $request->has('c') ? $request->c : [];
         $f_values = $request->has('v') ? $request->v : [];
         $price = [
-            'min' => $f_min_price ?? Book::orderByDesc('price')->first()->price,
-            'max' => $f_max_price ?? Book::orderBy('price')->first()->price,
+            'min' => $f_min_price ?? Book::orderBy('price')->first()->price,
+            'max' => $f_max_price ?? Book::orderByDesc('price')->first()->price,
         ];
         $order = isset($f_order) ?  $orderConfig[$f_order] : null;
 

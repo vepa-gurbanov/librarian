@@ -39,3 +39,8 @@ Route::controller(BookController::class)
         Route::patch('/book/{slug}/update', 'update');
         Route::delete('/book/{slug}/delete', 'delete')->name('books.delete');
     });
+
+Route::controller(BookController::class)
+    ->group(function () {
+
+    });

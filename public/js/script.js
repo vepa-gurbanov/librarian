@@ -75,10 +75,8 @@ swiperAuthors();
 
 $('button#searchbar').on('click', function () {
     let q = $('input#searchbar').val();
-    let input = '<input type="hidden" name="q" value="'+q+'">';
     let form = $('form#bookFilter');
-    alert(form)
+    let input = '<input type="hidden" name="q" value="'+q+'">';
     form.append(input);
     form.submit();
 });
-``

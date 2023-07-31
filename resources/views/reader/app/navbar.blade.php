@@ -30,6 +30,11 @@
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">Books</a>
                     <ul class="dropdown-menu" style="max-width: 1080px; max-height: 480px">
+                        <li>
+                            <a class="dropdown-item" href="{{ route('books.index') }}">
+                                See all Books
+                            </a>
+                        </li>
                         @foreach($categories as $category)
                             <li>
                                 <a class="dropdown-item" href="{{ route('books.index', ['c' => [[$category->id]]]) }}">
@@ -44,7 +49,7 @@
         </div>
         <form class="d-flex" role="search">
             <div class="input-group">
-                <input type="text" class="form-control rounded-pill rounded-end-0" placeholder="Search.." id="searchbar" aria-describedby="searchbar" value="" />
+                <input type="text" class="form-control rounded-pill rounded-end-0" placeholder="Search.." id="searchbar" aria-describedby="searchbar" value="{{ request()->has('q') ? request('q') : '' }}" />
                 <button type="button" class="input-group-text bg-primary rounded-pill rounded-start-0" id="searchbar"><i class="bi-search"></i></button>
             </div>
         </form>
