@@ -3,7 +3,10 @@
 namespace App\Http\Controllers\Reader\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Reader;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -19,6 +22,10 @@ class LoginController extends Controller
         $validation = $request->validate([
             'phone' => ['required', 'integer', 'between:60000000,65999999'],
         ]);
+
+        if (!Reader::where('phone', $validation['phone'])->exists()) {
+            return back()->with('error', 'Account doesn\'t exist!');
+        }
 
         $token = Str::random(60);
         $code = mt_rand(10000, 99999);
@@ -40,5 +47,17 @@ class LoginController extends Controller
 
         return to_route('verify', ['token' => $token])
             ->with('status', 'Verification sent!');
+    }
+
+
+    public function destroy(Request $request): RedirectResponse
+    {
+        Auth::guard('reader')->logout();
+
+        $request->session()->invalidate();
+
+        $request->session()->regenerateToken();
+
+        return redirect('/');
     }
 }

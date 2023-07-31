@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Reader;
 
 use App\Http\Controllers\Controller;
+use App\Models\Author;
 use App\Models\Book;
 use App\Models\Category;
 use Barryvdh\Debugbar\Facades\Debugbar;

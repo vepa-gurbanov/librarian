@@ -8,6 +8,13 @@
         @honeypot
         <div class="h3 mb-3 fw-normal text-center">{{ __('You\'re welcome!') }}</div>
 
+        @if (session('error'))
+            <div class="alert alert-danger text-danger-emphasis mb-3" role="alert">
+                {{ session('error') }}
+                <a href="{{ route('login') }}" class="text-danger-emphasis">Login</a>
+            </div>
+        @endif
+
         <!-- Name -->
             <label class="form-label fw-bold" for="name">{{ __('Name') }} <span class="text-danger">*</span></label>
             <input type="text"

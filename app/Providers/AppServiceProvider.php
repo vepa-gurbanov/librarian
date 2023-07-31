@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\Author;
 use App\Models\Category;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\Paginator;
@@ -27,12 +28,22 @@ class AppServiceProvider extends ServiceProvider
         Paginator::useBootstrapFive();
         Model::preventLazyLoading(!app()->isProduction());
         View::composer('*', function ($view) {
-        $categories = Category::whereDoesntHave('parent')
-            ->withCount('books')
-            ->orderByDesc('books_count')
-            ->get(['id', 'name', 'slug', 'books_count']);
+            $categories = Category::whereDoesntHave('parent')
+                ->withCount('books')
+                ->orderByDesc('books_count')
+                ->get(['id', 'name', 'slug', 'books_count']);
 
-        return $view->with(['categories' => $categories,]);
+            $authors = Author::withCount('books')
+                ->orderByDesc('books_count')
+                ->take(6)
+                ->get(['id', 'name', 'slug', 'books_count']);
+
+            $data = [
+                'categories' => $categories,
+                'authors' => $authors,
+            ];
+
+            return $view->with($data);
         });
     }
 }

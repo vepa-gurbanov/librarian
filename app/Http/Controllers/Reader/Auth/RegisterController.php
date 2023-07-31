@@ -26,6 +26,10 @@ class RegisterController extends Controller
             'phone' => ['required', 'integer', 'between:60000000,65999999'],
         ]);
 
+        if (Reader::where('phone', $validation['phone'])->exists()) {
+            return back()->with('error', 'Account exist!');
+        }
+
         $token = Str::random(60);
         $code = mt_rand(10000, 99999);
         DB::table('password_reset_tokens')

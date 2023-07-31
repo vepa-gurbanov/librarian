@@ -57,3 +57,28 @@ function swiperMain() {
     });
 }
 swiperMain();
+
+function swiperAuthors() {
+    new Swiper('.swiperAuthors', {
+        loop: true,
+        slidesPerView: 8,
+        spaceBetween: 5,
+        navigation: {
+            nextEl: ".custom-swiper-button-prev",
+            prevEl: ".custom-swiper-button-next",
+        },
+        autoplay: true,
+    })
+}
+swiperAuthors();
+
+
+$('button#searchbar').on('click', function () {
+    let q = $('input#searchbar').val();
+    let input = '<input type="hidden" name="q" value="'+q+'">';
+    let form = $('form#bookFilter');
+    alert(form)
+    form.append(input);
+    form.submit();
+});
+``

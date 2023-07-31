@@ -20,7 +20,19 @@ class AuthAttemptFactory extends Factory
     public function definition(): array
     {
         $agent = UserAgent::inRandomOrder()->first();
-        $ip = IpAddress::where('created_at', '>=', $agent->created_at)->inRandomOrder()->first()->id;
+
+        $i = 0;
+        do {
+            try {
+                $i++;
+                $ip = IpAddress::where('created_at', '>=', $agent->created_at)->inRandomOrder()->first()->id;
+                break;
+            } catch(\Exception $e) {
+                echo("Ip Address couldn't found!");
+            }
+
+        } while($i > 10);
+
         return [
             'ip_address_id' => $ip,
             'user_agent_id' => $agent->id,

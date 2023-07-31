@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Str;
 use Spatie\Translatable\HasTranslations;
 
@@ -18,10 +19,9 @@ class Author extends Model
     public $translatable = ['name'];
 
 
-    public function books()
+    public function books(): BelongsToMany
     {
-        $this->belongsToMany(Book::class, 'book_authors')
-            ->orderByPivot('sort_order');
+        return $this->belongsToMany(Book::class, 'book_authors', 'author_id', 'book_id');
     }
 
 

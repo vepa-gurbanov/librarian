@@ -3,14 +3,18 @@
 namespace App\Http\Controllers\Reader;
 
 use App\Http\Controllers\Controller;
+use App\Models\Attribute;
+use App\Models\Author;
 use App\Models\Book;
+use App\Models\Category;
+use App\Models\Publisher;
 use Illuminate\Http\Request;
 
-class ProductController extends Controller
+class BookController extends Controller
 {
     public function index(Request $request) {
         $orderConfig = config()->get('settings.ordering');
-        $request->validate([
+        $validation = $request->validate([
             'q' => ['nullable', 'string', 'max:50'],
             'f_min_price' => ['nullable', 'integer', 'min:0',],
             'f_max_price' => ['nullable', 'integer', 'max:' . Book::orderByDesc('price')->first()->price,],
@@ -31,7 +35,7 @@ class ProductController extends Controller
 
         ]);
 
-        $q = isset($validation['q']) ?: null;
+        $q = $request->has('q') ? $validation['q'] : null;
         $f_min_price = $validation['f_min_price'] ?? null;
         $f_max_price = $validation['f_max_price'] ?? null;
         $f_order = $validation['ordering'] ?? null;
@@ -39,12 +43,10 @@ class ProductController extends Controller
         $f_authors = $request->has('au') ? $request->au : [];
         $f_categories = $request->has('c') ? $request->c : [];
         $f_values = $request->has('v') ? $request->v : [];
-
         $price = [
             'min' => $f_min_price ?? Book::orderByDesc('price')->first()->price,
             'max' => $f_max_price ?? Book::orderBy('price')->first()->price,
         ];
-
         $order = isset($f_order) ?  $orderConfig[$f_order] : null;
 
         $books = Book::when($q, function ($query) use ($q) {
@@ -98,18 +100,46 @@ class ProductController extends Controller
                 });
             })
             ->orderByDesc('id')
-            ->with('categories:name')
+            ->with('categories:id,slug,name')
             ->paginate(24, ['id', 'name', 'slug', 'price', 'page', 'liked'])
             ->withQueryString();
 
-        return $books;
+        $maxPrice = Book::orderByDesc('price')->first()->price;
+        $searchCategories = Category::orderBy('id')
+            ->get(['id', 'name']);
+
+        $searchAuthors = Author::orderBy('id')
+            ->get(['id', 'name']);
+
+        $searchPublishers = Publisher::orderBy('id')
+            ->get(['id', 'name']);
+
+        $searchAttrs = Attribute::orderBy('sort_order')
+            ->orderBy('id')
+            ->with('values:id,attribute_id,name')
+            ->get(['id', 'name']);
+
 
         $data = [
-            'books' => $books,
             'q' => $q,
+            'f_min_price' => $f_min_price,
+            'f_max_price' => $f_max_price,
+            'f_order' => $f_order,
+            'f_categories' => collect($f_categories),
+            'f_publishers' => collect($f_publishers),
+            'f_authors' => collect($f_authors),
+            'f_values' => collect($f_values)->collapse(),
+            'maxPrice' => $maxPrice,
+            'searchCategories' => $searchCategories,
+            'searchAuthors' => $searchAuthors,
+            'searchPublishers' => $searchPublishers,
+            'searchAttrs' => $searchAttrs,
+            'orderConfig' => $orderConfig,
+
+            'books' => $books,
         ];
 
-        return view('reader.product.index')
+        return view('reader.book.index')
             ->with($data);
     }
 }

@@ -3,8 +3,8 @@
 use App\Http\Controllers\Reader\Auth\LoginController;
 use App\Http\Controllers\Reader\Auth\RegisterController;
 use App\Http\Controllers\Reader\Auth\VerificationController;
+use App\Http\Controllers\Reader\BookController;
 use App\Http\Controllers\Reader\HomeController;
-use App\Http\Controllers\Reader\ProductController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -25,16 +25,17 @@ Route::post('/0auth1', [LoginController::class, 'store']);
 Route::post('/0auth2r/{token}', [VerificationController::class, 'resend'])->name('resend');
 Route::get('/0auth2/{token}', [VerificationController::class, 'create'])->name('verify');
 Route::post('/0auth2/{token}', [VerificationController::class, 'store']);
+Route::post('/0auth1/logout', [LoginController::class, 'destroy'])->name('logout')->middleware('auth:reader');
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
-Route::controller(ProductController::class)
+Route::controller(BookController::class)
     ->group(function () {
-        Route::get('/products', 'index')->name('products.index');
-        Route::get('/product/create', 'create')->name('products.create');
-        Route::post('/product/store', 'store');
-        Route::get('/product/{slug}/show', 'show')->name('products.show');
-        Route::get('/product/{slug}/edit', 'edit')->name('products.edit');
-        Route::patch('/product/{slug}/update', 'update');
-        Route::delete('/product/{slug}/delete', 'delete')->name('products.delete');
+        Route::get('/books', 'index')->name('books.index');
+        Route::get('/book/create', 'create')->name('books.create');
+        Route::post('/book/store', 'store');
+        Route::get('/book/{slug}/show', 'show')->name('books.show');
+        Route::get('/book/{slug}/edit', 'edit')->name('books.edit');
+        Route::patch('/book/{slug}/update', 'update');
+        Route::delete('/book/{slug}/delete', 'delete')->name('books.delete');
     });
