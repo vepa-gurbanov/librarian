@@ -18,6 +18,8 @@ class HomeController extends Controller
             ->take(10)
             ->get(['name', 'slug', 'price', 'page', 'liked']);
 
+        if ($request->has('q')) {
+
             $q = $request->q;
             $books = Book::where('name', 'like', '%' . $q . '%')
                 ->orWhere('full_name', 'like', '%' . $q . '%')
@@ -37,6 +39,9 @@ class HomeController extends Controller
                 ->with('categories:id,slug,name')
                 ->paginate(24, ['id', 'name', 'slug', 'price', 'page', 'liked'])
                 ->withQueryString();
+        } else {
+            $books = [];
+        }
 
         $data = [
             [

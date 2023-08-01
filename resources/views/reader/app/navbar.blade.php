@@ -47,10 +47,10 @@
                 </li>
             </ul>
         </div>
-        <form class="d-flex" role="search">
+        <form class="d-flex" role="search" method="GET" action="{{ route('home') }}">
             <div class="input-group">
-                <input type="text" class="form-control rounded-pill rounded-end-0" placeholder="Search.." id="searchbar" aria-describedby="searchbar" value="{{ request()->has('q') ? request('q') : '' }}" />
-                <button type="button" class="input-group-text bg-primary rounded-pill rounded-start-0" id="searchbar"><i class="bi-search"></i></button>
+                <input type="text" class="form-control rounded-pill rounded-end-0" placeholder="Search.." value="{{ request()->has('q') ? request('q') : '' }}" />
+                <button type="submit" class="input-group-text bg-primary rounded-pill rounded-start-0"><i class="bi-search"></i></button>
             </div>
         </form>
     </div>
