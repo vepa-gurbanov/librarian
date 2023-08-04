@@ -1,7 +1,7 @@
 <nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-dark" aria-label="Main navigation">
     <div class="container-fluid">
         <div class="d-flex bg-white rounded">
-            <a href="{{ route('home') }}" class="tdn">
+            <a href="{{ route('home') }}" class="text-decoration-none">
                 <img class="mx-2 p-1" src="{{ asset('img/logo.png') }}" alt="" width="40" height="40"></a>
             <div class="h6 mt-3 mb-0 me-2 fw-bolder font-monospace">{{ config('app.name') }}</div>
         </div>
@@ -15,7 +15,7 @@
                             @honeypot
                         </form>
                         <ul class="dropdown-menu" style="max-width: 1080px; max-height: 480px">
-                            <li><a class="dropdown-item" href="#">Dashboard</a></li>
+                            <li><a class="dropdown-item" href="{{ route('dashboard') }}">Dashboard</a></li>
                             <li><a class="dropdown-item bi-arrow-left-short" href="javascript:void(0);" onclick="$('form#ReaderLogoutForm').submit();">Logout</a></li>
                         </ul>
                     @else
@@ -45,8 +45,54 @@
                         @endforeach
                     </ul>
                 </li>
+
+                <li class="nav-item dropdown-center">
+                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">Shelves</a>
+                    <div class="dropdown-menu" style="width: 610px; height: 210px">
+                        <div class="row row-cols-3 row-cols-md-4 row-cols-xl-5">
+                            <div class="col-auto">
+                                <a class="dropdown-item" href="{{ route('shelves.index') }}">
+                                    Shelves
+                                </a>
+                            </div>
+                            @foreach($shelves as $shelf)
+                                <div class="col-auto">
+                                    <a class="dropdown-item" href="{{ route('shelves.books', ['id' => $shelf->id]) }}">
+                                        Shelf <span class="fw-bolder">{{ strtoupper($shelf->name) }}</span>
+                                        <span class="badge text-bg-light rounded-pill align-text-bottom">{{ $shelf->books_count }}</span>
+                                    </a>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </li>
             </ul>
         </div>
+
+        <!-- Language -->
+        <div class="dropdown-center">
+            <button class="btn btn-light btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <small>
+                    {{ array_key_exists($languages['locale'], $languages['available']) ? $languages['available'][$languages['locale']] : strtoupper($languages['locale']) }}
+                </small>
+                - <img src="{{ asset('img/flags/' . $languages['locale'] . '.png') }}" alt="" class="img-fluid" width="16" height="16">
+            </button>
+            <ul class="dropdown-menu">
+                @foreach($languages['available'] as $key => $val)
+                    @continue($key == $languages['locale'])
+                    <li style="font-size: .875em;">
+                        <a class="custom-nav-link dropdown-item" href="{{ route('language', $key) }}">
+                            <small>
+                                {{ $val }}
+                            </small>
+                            - <img src="{{ asset('img/flags/' . $key . '.png') }}" alt="" class="img-fluid" width="16" height="16">
+                        </a>
+                    </li>
+                @endforeach
+            </ul>
+        </div>
+        <!-- //. end Language -->
+
         <form class="d-flex" role="search" method="GET" action="{{ route('home') }}">
             <div class="input-group">
                 <input type="text" class="form-control rounded-pill rounded-end-0" placeholder="Search.." value="{{ request()->has('q') ? request('q') : '' }}" />

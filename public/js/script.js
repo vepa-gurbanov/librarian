@@ -1,6 +1,13 @@
 const $ = jQuery;
 $(document).ready(function () {
     $.noConflict();
+
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf_token"]').attr('content')
+        }
+    });
+
 });
 (() => {
     'use strict'
@@ -34,12 +41,13 @@ function swiperSlider() {
 swiperSlider();
 
 function swiperMain() {
-    $('.swiperLiked').each(function(){
+    $('.swiperContent').each(function(){
         let swiper = $(this).attr('id');
         new Swiper( '#' + swiper, {
-            slidesPerView: 4,
+            slidesPerView: 5,
             spaceBetween: 30,
             grabCursor: true,
+            loop: true,
             pagination: {
                 el: ".swiper-pagination",
                 clickable: true,
@@ -80,3 +88,46 @@ $('button#searchbar').on('click', function () {
     form.append(input);
     form.submit();
 });
+
+// function bookRating() {
+//     $("#rating").rating({
+//         min: 0,
+//         max: 5,
+//         step: 0.1,
+//         stars: 5,
+//         // showCaption:false,
+//         starCaptions: function (val) {
+//             if (val < 3) {
+//                 return "Low: " + val + " stars";
+//             } else {
+//                 return "High: " + val + " stars";
+//             }
+//         }
+//     });
+// }
+// bookRating();
+
+function rate() {
+    $('input:radio[name=rate]').on('click', function () {
+        let rating = $(this).val();
+        let id = $('input:hidden[name=bookID]').val();
+        $.ajax({
+            url: 'http://127.0.0.1:8000/books/'+id+'/'+rating,
+            method: 'GET',
+            dataType: 'JSON',
+            processData: false,
+            success:function(response) {
+                location.reload();
+                console.log(response);
+            },
+            error:function (response, error) {
+                if (response.statusText === 'Forbidden')
+                {
+                    location.replace('http://127.0.0.1:8000/0auth1');
+                }
+                console.log(response.statusText);
+            }
+        });
+    })
+}
+rate()

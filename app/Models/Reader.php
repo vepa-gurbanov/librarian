@@ -4,14 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class Reader extends Authenticatable
 {
     use HasFactory;
-
-    protected $guarded = ['id', 'document_id'];
-
 
     protected $fillable = [
         'name',
@@ -35,5 +34,17 @@ class Reader extends Authenticatable
     public function document(): BelongsTo
     {
         return $this->belongsTo(Document::class);
+    }
+
+
+    public function shelf(): HasOne
+    {
+        return $this->hasOne(Shelf::class);
+    }
+
+
+    public function ratedBooks(): BelongsToMany
+    {
+        return $this->belongsToMany(Book::class, 'book_ratings');
     }
 }

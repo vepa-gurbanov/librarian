@@ -1,3 +1,7 @@
+.border-end, .border-bottom, .border-top, .border-start, .border {
+    --bs-border-color: white !important;
+}
+
 /* Start Swiper */
 .swiper {
     width: 100%;

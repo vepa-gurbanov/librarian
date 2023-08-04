@@ -33,6 +33,7 @@ class DatabaseSeeder extends Seeder
             ]),
             \App\Models\Author::factory(25)->create(),
             \App\Models\Book::factory(200)->create(),
+            $this->call(ShelfSeeder::class),
         ];
     }
 
@@ -43,6 +44,7 @@ class DatabaseSeeder extends Seeder
             \App\Models\Registration::factory(250)->create(),
         ];
     }
+
 
     public function run(): void
     {

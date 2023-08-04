@@ -8,6 +8,7 @@ use App\Models\Author;
 use App\Models\Book;
 use App\Models\Category;
 use App\Models\Publisher;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class BookController extends Controller
@@ -101,7 +102,7 @@ class BookController extends Controller
             })
             ->orderByDesc('id')
             ->with('categories:id,slug,name')
-            ->paginate(24, ['id', 'name', 'slug', 'price', 'page', 'liked'])
+            ->paginate(24, ['id', 'name', 'slug', 'price', 'page', 'liked', 'image'])
             ->withQueryString();
 
         $maxPrice = Book::orderByDesc('price')->first()->price;
@@ -141,5 +142,33 @@ class BookController extends Controller
 
         return view('reader.book.index')
             ->with($data);
+    }
+
+    public function show(string $slug) {
+        $book = Book::where('slug', $slug)->with('ratedReaders')->firstOrFail();
+
+        $data = [
+            'book' => $book,
+        ];
+
+//        return $book->ratedReaders->count();
+
+        return view('reader.book.show')->with($data);
+    }
+
+
+    public function rate($id, $rating): \Illuminate\Http\RedirectResponse|JsonResponse
+    {
+        if (!auth('reader')->check()) {
+            return response()->json(['error' => 'needs-authentication'], 403);
+        }
+
+        try {
+            $book = Book::findOrFail($id);
+            $book->rate(id: auth('reader')->id(), rating: $rating);
+            return response()->json(['success' => 'Rating succeed']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
     }
 }

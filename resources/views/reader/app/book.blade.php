@@ -1,5 +1,5 @@
 <div class="border rounded p-2">
-    <a href="#">
+    <a href="{{ route('books.show', $book->slug) }}">
         <img src="{{ $book->image() }}" alt="{{ $book->name }}" class="img-fluid">
     </a>
 </div>

@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Spatie\Translatable\HasTranslations;
@@ -41,6 +44,12 @@ class Book extends Model
     }
 
 
+    public function shelf(): BelongsTo
+    {
+        return $this->belongsTo(Shelf::class);
+    }
+
+
     public function categories(): BelongsToMany
     {
         return $this->belongsToMany(Category::class, 'book_categories');
@@ -55,7 +64,22 @@ class Book extends Model
 
     public function publishers(): BelongsToMany
     {
-        return $this->belongsToMany(Publisher::class, 'book_publishers');
+        return $this->belongsToMany(Publisher::class, 'book_publishers')
+            ->withPivot('published_country_' . app()->getLocale());
+    }
+
+
+    public function publishedCountries(): array
+    {
+        $book = Book::where('id', $this->id)
+            ->with('publishers')
+            ->first(['id', 'name', 'slug']);
+        $array = [];
+        foreach ($book->publishers as $publisher) {
+            $array[] = $publisher->pivot['published_country_' . app()->getLocale()];
+        }
+
+        return array_unique($array);
     }
 
 
@@ -66,18 +90,73 @@ class Book extends Model
     }
 
 
-//    public function registrations()
-//    {
-//        return $this->hasMany(Registration::class);
-//    }
+    public function registrations(): HasMany
+    {
+        return $this->hasMany(Registration::class);
+    }
+
+
+    public function ratedReaders(): BelongsToMany
+    {
+        return $this->belongsToMany(Reader::class, 'book_ratings')
+            ->withPivot('rating');
+    }
+
+
+    public function ratedReader($id): ?bool
+    {
+        return isset($id) ?
+                Reader::query()
+                    ->where('id', $id)
+                    ->whereHas('ratedBooks', function (Builder $query) {
+                        $query->where('book_id', $this->id);
+                    })->exists()
+            : null;
+    }
+
+
+    public function averageRating() {
+        return DB::table('book_ratings')
+            ->where('book_id', $this->id)
+            ->average('rating') ?? number_format(0, '1');
+    }
+
+
+    public function totalRatings() {
+        return DB::table('book_ratings')
+            ->where('book_id', $this->id)
+            ->sum('rating');
+    }
+
+
+    public function rating($id) {
+        return DB::table('book_ratings')
+            ->where('book_id', $this->id)
+            ->where('reader_id', $id)
+            ->first('rating')->rating ?? number_format(0, '1');
+    }
+
+
+    public function rate($id, $rating)
+    {
+        return DB::table('book_ratings')
+            ->where('book_id', $this->id)
+            ->updateOrInsert(
+                [
+                    'book_id' => $this->id,
+                    'reader_id' => $id,
+                ],
+                ['rating' => $rating]
+            );
+
+    }
 
 
     public function image(): string
     {
-        return asset('img/book.jpg');
-//        return $this->image
-//            ? Storage::url('books/' . $this->id . '/' . $this->image)
-//            : asset('assets/img/book.jpg');
+        return $this['image']
+            ? Storage::url('books/' . $this->id . '/' . $this->image)
+            : asset('img/book.jpg');
     }
 
 
