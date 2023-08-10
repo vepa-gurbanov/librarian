@@ -26,7 +26,7 @@ class UserAgentFactory extends Factory
             'robot' => null,
             'disabled' => $this->faker->boolean(20),
             'location' => $this->faker->latitude . ', ' . $this->faker->longitude,
-            'created_at' => now()->subHours(mt_rand(0, 750)),
+            'created_at' => now()->subHours(mt_rand(300, 750)),
         ];
     }
 }

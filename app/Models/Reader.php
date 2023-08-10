@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
@@ -46,5 +47,11 @@ class Reader extends Authenticatable
     public function ratedBooks(): BelongsToMany
     {
         return $this->belongsToMany(Book::class, 'book_ratings');
+    }
+
+
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
     }
 }

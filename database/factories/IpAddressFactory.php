@@ -18,7 +18,7 @@ class IpAddressFactory extends Factory
     {
         return [
             'ip_address' => $this->faker->ipv4(),
-            'created_at' => now()->subHours(mt_rand(5, 750)),
+            'created_at' => now()->subHours(mt_rand(5, 300)),
         ];
     }
 }

@@ -17,8 +17,6 @@ class Book extends Model
 {
     use HasFactory, HasTranslations;
 
-    protected $guarded = ['id', 'reader_id'];
-
     public $translatable = ['name', 'full_name', 'body', 'description'];
 
     protected $casts = [
@@ -96,6 +94,27 @@ class Book extends Model
     }
 
 
+    public function options(): HasMany
+    {
+        return $this->hasMany( Option::class);
+    }
+
+
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class)
+            ->whereNotNull('review');
+    }
+
+
+    public function notes(): HasMany
+    {
+        return $this->hasMany(Review::class)
+            ->where('reader_id', auth('reader')->id())
+            ->whereNotNull('note');
+    }
+
+
     public function ratedReaders(): BelongsToMany
     {
         return $this->belongsToMany(Reader::class, 'book_ratings')
@@ -106,11 +125,11 @@ class Book extends Model
     public function ratedReader($id): ?bool
     {
         return isset($id) ?
-                Reader::query()
-                    ->where('id', $id)
-                    ->whereHas('ratedBooks', function (Builder $query) {
-                        $query->where('book_id', $this->id);
-                    })->exists()
+            Reader::query()
+                ->where('id', $id)
+                ->whereHas('ratedBooks', function (Builder $query) {
+                    $query->where('book_id', $this->id);
+                })->exists()
             : null;
     }
 
@@ -137,7 +156,7 @@ class Book extends Model
     }
 
 
-    public function rate($id, $rating)
+    public function rate($id, $rating): bool
     {
         return DB::table('book_ratings')
             ->where('book_id', $this->id)
@@ -160,10 +179,36 @@ class Book extends Model
     }
 
 
-//    public function available(): bool
-//    {
-//        return $this->registrations()
-//            ->where('reader_status', 'reading')
-//            ->exists();
+    public function available(): bool
+    {
+        return $this->registrations()
+            ->where('reader_status', 'reading')
+            ->exists();
+    }
+
+
+    public function setOptions($type, $format, $price, $source)
+    {
+        return DB::table('options')->updateOrInsert([
+            'book_id' => $this->id,
+            'type' => $type,
+        ], [
+            'format' => $format,
+            'price' => $price,
+            'source' => $source,
+        ]);
+    }
+
+
+//    public function putOptions($type, array $val) {
+//        foreach (json_decode($this->options) as $key => $option) {
+//            if ($this->option->->type === $type) {
+//                if (isset($val['src'])) $option->src = $val['src'];
+//                if (isset($val['price'])) $option->price = $val['price'];
+//                $this->update();
+//            }
+//        }
+//        return $this->update();
 //    }
+
 }

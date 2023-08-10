@@ -13,10 +13,52 @@
                     </div>
                     <div class="d-flex justify-content-between overflow-hidden mb-3">
                         <div class="col-auto me-2">
-                            <button type="button" class="btn btn-light bi-stickies"><br><span class="text-center">Notes</span></button>
+                            <button type="button" data-bs-target="#bookNote{{ $book->id }}" data-bs-toggle="modal" class="btn btn-light bi-stickies">
+                                <br><span class="text-center">Notes</span>
+                            </button>
+
+                            <div class="modal fade" id="bookNote{{ $book->id }}" tabindex="-1" aria-labelledby="bookNote{{ $book->id }}Label" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-body">
+                                            <form action="{{ route('book.note', $book->slug) }}" method="POST">
+                                                @method('POST')
+                                                @csrf
+                                                <textarea class="form-control bg-body-tertiary" name="note" id="bookNote{{ $book->id }}" cols="30" rows="10"></textarea>
+                                                <div class="mt-3 text-end">
+                                                    <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">Close</button>
+                                                    <button type="submit" class="btn btn-secondary btn-sm">Submit</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
                         <div class="col-auto me-2">
-                            <button type="button" class="btn btn-light bi-chat-square-text"><br><span class="text-center">Review</span></button>
+                            <button type="button" data-bs-target="#bookReview{{ $book->id }}" data-bs-toggle="modal" class="btn btn-light bi-chat-square-text">
+                                <br><span class="text-center">Review</span>
+                            </button>
+
+                            <div class="modal fade" id="bookReview{{ $book->id }}" tabindex="-1" aria-labelledby="bookReview{{ $book->id }}Label" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-body">
+                                            <form action="{{ route('book.review', $book->slug) }}" method="POST">
+                                                @method('POST')
+                                                @csrf
+                                                <textarea class="form-control bg-body-tertiary" name="review" id="bookReview{{ $book->id }}" cols="30" rows="10"></textarea>
+                                                <div class="mt-3 text-end">
+                                                    <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">Close</button>
+                                                    <button type="submit" class="btn btn-secondary btn-sm">Submit</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
                         <div class="col-auto">
                             <button type="button" class="btn btn-light bi-share"><br><span class="text-center">Share</span></button>
@@ -32,6 +74,11 @@
                                 <label for="{{ $number }}" title="text">{{ $number . ' ' . $number !== 1 ? 'stars' : 'star' }}</label>
                             @endforeach
                         </div>
+                    </div>
+                    <div class="mb-3">
+                        <a href="#" class="btn btn-sm btn-primary w-100">
+                            Rent: {{ number_format($book->price, '2') }} <span class="small-sm">TMT</span>
+                        </a>
                     </div>
                 </div>
                 <div class="col p-4">
@@ -54,14 +101,77 @@
                                 <i class="bi-star{{ intval(round($book->averageRating())) >= $rate ? '-fill' : '' }} text-warning"></i>
                             @endforeach
                             {{ number_format($book->averageRating(), 1) }}
-                        </span> ●
+                        </span> ·
                         <span>
                             {{ $book->totalRatings() }} ratings total
-                        </span> ●
+                        </span> ·
                         <span>
                             {{ $book->ratedReaders->count() }} {{ $book->ratedReaders->count() > 1 ? 'users' : 'user' }}  rated
                         </span>
                     </div>
+                    <div class="mb-3">
+                        @foreach($book->attributeValues as $value)
+                            <p class="small">{{ $value->attribute->name . ': ' . $value->name }}</p>
+                        @endforeach
+                    </div>
+                    <div class="mb-3">
+                        {{ $book->body }}
+                    </div>
+                    @if($book->options->count() > 0)
+                        <div class="mb-3">
+                            <p class="mb-1">Options:</p>
+
+                            <div class="d-inline-flex justify-content-between">
+                                @foreach($book->options as $option)
+                                    <div class="col-auto w-100 card shadow rounded m-1 p-2 bg-body-secondary">
+                                        <div class="small"><span>Type: </span>{{ $option->type }}</div>
+                                        <div class="small"><span>Format: </span>{{ $option->format }}</div>
+                                        <div class="small"><span>Volume: </span>{{ $option->volume }} mb</div>
+                                        <div class="small"><span>Price: </span>{{ number_format($option->price, '2') }} <span class="small-sm">TMT</span></div>
+                                        <a href="#" class="btn btn-sm btn-primary">Download {{ $option->type === 'electron' ? 'PDF' : strtoupper($option->type) }}</a>
+                                    </div>
+                                @endforeach
+                            </div>
+                            <div class="mb-3">
+                                <a href="#" class="btn btn-outline-primary m-1">
+                                    <span class="bi-gift-fill text-danger"></span>
+                                    <span class="text-danger">Bundle:</span> {{ $book->options->sum('price') + $book->price }}
+                                    <span class="small-sm">TMT</span>
+                                </a>
+                            </div>
+                        </div>
+                    @endif
+
+                    @if($book->reviews->count() > 0)
+                        <div class="mb-3">
+                            <p class="mb-1">Reviews:</p>
+                            @foreach($book->reviews as $review)
+                                <div class="mb-3 border-bottom small">
+                                    <span>{{ $review->reader->name }}</span>
+                                    <div class="ms-3">
+                                        <p class="mb-1">- {{ $review->review }}</p>
+                                        <span class="small-sm">{{ date_format($review->created_at, 'Y-m-d | H:i:s') }}</span>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+
+                    @if($book->notes->count() > 0)
+                        <div class="mb-3">
+                            <p class="mb-1">Notes:</p>
+                            @foreach($book->notes as $note)
+                                <div class="mb-3 border-bottom small">
+                                    <span>{{ $note->reader->name }}</span>
+                                    <div class="ms-3">
+                                        <p class="mb-1">- {{ $note->note }}</p>
+                                        <span class="small-sm">{{ date_format($note->created_at, 'Y-m-d | H:i:s') }}</span>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+
                 </div>
             </div>
         </div>

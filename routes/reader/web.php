@@ -35,13 +35,15 @@ Route::get('locale/{locale}', [HomeController::class, 'language'])->name('langua
 Route::controller(BookController::class)
     ->group(function () {
         Route::get('/books', 'index')->name('books.index');
-        Route::get('/book/create', 'create')->name('books.create');
-        Route::post('/book/store', 'store');
+        Route::get('/book/create', 'create')->name('books.create')->middleware('auth:reader');
+        Route::post('/book/store', 'store')->middleware('auth:reader');
         Route::get('/book/{slug}', 'show')->name('books.show');
-        Route::get('/book/{slug}/edit', 'edit')->name('books.edit');
-        Route::patch('/book/{slug}/update', 'update');
-        Route::delete('/book/{slug}/delete', 'delete')->name('books.delete');
-        Route::get('/books/{id}/{rating}', 'rate')->name('books.rate');
+        Route::get('/book/{slug}/edit', 'edit')->name('books.edit')->middleware('auth:reader');
+        Route::patch('/book/{slug}/update', 'update')->middleware('auth:reader');
+        Route::delete('/book/{slug}/delete', 'delete')->name('books.delete')->middleware('auth:reader');
+        Route::get('/books/{id}/{rating}', 'rate')->name('books.rate')->middleware('auth:reader');
+        Route::post('/book/{slug}/review', 'review')->name('book.review')->middleware('auth:reader');
+        Route::post('/book/{slug}/note', 'note')->name('book.note')->middleware('auth:reader');
     });
 
 Route::get('shelves/{id}/products', [ShelfController::class, 'shelfBooks'])->name('shelves.books');

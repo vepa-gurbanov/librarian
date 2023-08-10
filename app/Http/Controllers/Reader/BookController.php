@@ -8,6 +8,7 @@ use App\Models\Author;
 use App\Models\Book;
 use App\Models\Category;
 use App\Models\Publisher;
+use App\Models\Review;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -145,13 +146,14 @@ class BookController extends Controller
     }
 
     public function show(string $slug) {
-        $book = Book::where('slug', $slug)->with('ratedReaders')->firstOrFail();
+        $book = Book::where('slug', $slug)
+            ->with('ratedReaders', 'attributeValues.attribute', 'options', 'reviews.reader', 'notes.reader')->first();
 
         $data = [
             'book' => $book,
         ];
 
-//        return $book->ratedReaders->count();
+//        return $book->notes->count();
 
         return view('reader.book.show')->with($data);
     }
@@ -169,6 +171,38 @@ class BookController extends Controller
             return response()->json(['success' => 'Rating succeed']);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);
+        }
+    }
+
+
+    public function review(Request $request, $slug) {
+        $request->validate(['review' => ['required', 'string', 'max:2550']]);
+
+        try {
+            Review::create([
+                'book_id' => Book::query()->where('slug', $slug)->firstOrFail()->id,
+                'reader_id' => auth('reader')->id(),
+                'review' => $request->review,
+            ]);
+            return back()->with('success', 'Review added!');
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
+
+
+    public function note(Request $request, $slug) {
+        $request->validate(['note' => ['required', 'string', 'max:2550']]);
+
+        try {
+            Review::create([
+                'book_id' => Book::query()->where('slug', $slug)->firstOrFail()->id,
+                'reader_id' => auth('reader')->id(),
+                'note' => $request->note,
+            ]);
+            return back()->with('success', 'Note added!');
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
         }
     }
 }

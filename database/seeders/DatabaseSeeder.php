@@ -33,6 +33,7 @@ class DatabaseSeeder extends Seeder
             ]),
             \App\Models\Author::factory(25)->create(),
             \App\Models\Book::factory(200)->create(),
+            \App\Models\Review::factory(250)->create(),
             $this->call(ShelfSeeder::class),
         ];
     }
