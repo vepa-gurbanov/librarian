@@ -131,3 +131,15 @@ function rate() {
     })
 }
 rate()
+
+function aCollapse() {
+    let aCollapse = $('a[data-bs-toggle="collapse"]');
+    aCollapse.on('click', function () {
+        if (aCollapse.attr('aria-expanded') === 'false') {
+            aCollapse.text('Show more');
+        } else if (aCollapse.attr('aria-expanded') === 'true') {
+            aCollapse.text('Show less');
+        }
+    })
+}
+aCollapse();

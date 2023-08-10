@@ -145,30 +145,72 @@
                     @if($book->reviews->count() > 0)
                         <div class="mb-3">
                             <p class="mb-1">Reviews:</p>
-                            @foreach($book->reviews as $review)
-                                <div class="mb-3 border-bottom small">
-                                    <span>{{ $review->reader->name }}</span>
-                                    <div class="ms-3">
-                                        <p class="mb-1">- {{ $review->review }}</p>
-                                        <span class="small-sm">{{ date_format($review->created_at, 'Y-m-d | H:i:s') }}</span>
-                                    </div>
+
+                            @php $latest = $book->reviews->first(); @endphp
+                            <div class="mb-3 border-bottom small">
+                                <span>{{ $latest->reader->name }}</span>
+                                <div class="ms-3">
+                                    <p class="mb-1">- {{ $latest->review }}</p>
+                                    <span class="small-sm">{{ date_format($latest->created_at, 'Y-m-d | H:i:s') }}</span>
                                 </div>
-                            @endforeach
+                            </div>
+
+                            <p class="d-inline-flex gap-1">
+                                <a data-bs-toggle="collapse" href="#collapseReview" role="button" aria-expanded="false" aria-controls="collapseReview">
+                                    Show more
+                                </a>
+                            </p>
+                            <div class="collapse" id="collapseReview">
+                                <div class="card card-body bg-transparent border-0">
+                                    @foreach($book->reviews as $review)
+                                        @continue($loop->first)
+                                        <div class="mb-3 border-bottom small">
+                                            <span>{{ $review->reader->name }}</span>
+                                            <div class="ms-3">
+                                                <p class="mb-1">- {{ $review->review }}</p>
+                                                <span class="small-sm">{{ date_format($review->created_at, 'Y-m-d | H:i:s') }}</span>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
                         </div>
                     @endif
 
                     @if($book->notes->count() > 0)
                         <div class="mb-3">
                             <p class="mb-1">Notes:</p>
-                            @foreach($book->notes as $note)
-                                <div class="mb-3 border-bottom small">
-                                    <span>{{ $note->reader->name }}</span>
-                                    <div class="ms-3">
-                                        <p class="mb-1">- {{ $note->note }}</p>
-                                        <span class="small-sm">{{ date_format($note->created_at, 'Y-m-d | H:i:s') }}</span>
-                                    </div>
+
+                            @php $latest = $book->notes->first(); @endphp
+                            <div class="mb-3 border-bottom small">
+                                <span>{{ $latest->reader->name }}</span>
+                                <div class="ms-3">
+                                    <p class="mb-1">- {{ $latest->note }}</p>
+                                    <span class="small-sm">{{ date_format($latest->created_at, 'Y-m-d | H:i:s') }}</span>
                                 </div>
-                            @endforeach
+                            </div>
+
+                            <p class="d-inline-flex gap-1">
+                                <a data-bs-toggle="collapse" href="#collapseNote" role="button" aria-expanded="false" aria-controls="collapseNote">
+                                    Show more
+                                </a>
+                            </p>
+                            <div class="collapse" id="collapseNote">
+                                <div class="card card-body bg-transparent border-0">
+                                    @foreach($book->notes as $note)
+                                        @continue($loop->first)
+                                        <div class="mb-3 border-bottom small">
+                                            <span>{{ $note->reader->name }}</span>
+                                            <div class="ms-3">
+                                                <p class="mb-1">- {{ $note->note }}</p>
+                                                <span class="small-sm">{{ date_format($note->created_at, 'Y-m-d | H:i:s') }}</span>
+                                            </div>
+                                        </div>
+
+                                    @endforeach
+
+                                </div>
+                            </div>
                         </div>
                     @endif
 

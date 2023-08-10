@@ -103,7 +103,8 @@ class Book extends Model
     public function reviews(): HasMany
     {
         return $this->hasMany(Review::class)
-            ->whereNotNull('review');
+            ->whereNotNull('review')
+            ->orderByDesc('id');
     }
 
 
@@ -111,7 +112,8 @@ class Book extends Model
     {
         return $this->hasMany(Review::class)
             ->where('reader_id', auth('reader')->id())
-            ->whereNotNull('note');
+            ->whereNotNull('note')
+            ->orderByDesc('id');
     }
 
 
