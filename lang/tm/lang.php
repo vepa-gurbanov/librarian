@@ -6,5 +6,6 @@ return [
     'rent' => 'Kärende',
     'day' => 'Gün',
     'off' => 'arzanladyş',
+    'new' => 'Täze',
     'price' => 'Bahasy',
 ];

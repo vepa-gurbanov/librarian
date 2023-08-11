@@ -16,9 +16,6 @@ $(document).ready(function () {
     })
 })()
 
-$('a').on('click', function () {
-    console.log('clicked');
-});
 
 function swiperSlider() {
     let swiper = new Swiper(".swiperSlider", {
@@ -143,3 +140,40 @@ function aCollapse() {
     })
 }
 aCollapse();
+
+
+function like() {
+    let likeButton = $('a[content=like]');
+    likeButton.on('click', function () {
+        let a = $(this);
+        let id = a.attr('id');
+        let totalLikes = $('span#book' + id);
+        $.ajax({
+            method: 'GET',
+            url: '/book/' + id + '/like',
+            success: function (response) {
+                if (response === 'liked') {
+                    a.removeClass('text-dark');
+                    a.addClass('text-danger');
+                    totalLikes.text(parseInt(totalLikes.text()) + 1);
+                } else if (response === 'disliked') {
+                    a.removeClass('text-danger');
+                    a.addClass('text-dark');
+                    totalLikes.text(parseInt(totalLikes.text()) - 1);
+                }
+
+                // Live toast
+                const toastBootstrap = bootstrap.Toast.getOrCreateInstance($('#liveToast'))
+                let toast = $('#liveToast .toast-body');
+                toast.addClass('toast-body bg-success-subtle text-success-emphasis rounded').text(response);
+                toastBootstrap.show()
+                // Live toast
+
+            },
+            error: function (jqXHR, textStatus, response) {
+                /* some function */
+            }
+        });
+    });
+}
+like();

@@ -43,6 +43,7 @@ Route::controller(BookController::class)
         Route::delete('/book/{slug}/delete', 'delete')->name('books.delete')->middleware('auth:reader');
         Route::get('/books/{id}/{rating}', 'rate')->name('books.rate')->middleware('auth:reader');
         Route::post('/book/{slug}/review_note', 'reviewAndNote')->name('book.review.note')->middleware('auth:reader');
+        Route::get('/book/{id}/like', 'like')->name('book.like');
     });
 
 Route::get('shelves/{id}/products', [ShelfController::class, 'shelfBooks'])->name('shelves.books');

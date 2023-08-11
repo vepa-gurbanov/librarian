@@ -11,6 +11,7 @@ use App\Models\Publisher;
 use App\Models\Review;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cookie;
 
 class BookController extends Controller
 {
@@ -149,7 +150,10 @@ class BookController extends Controller
         $book = Book::where('slug', $slug)
             ->with('ratedReaders', 'attributeValues.attribute', 'options', 'reviews.reader', 'notes.reader')->first();
 
+        $liked = in_array($book->id, $this->getCookie('likedBooks')) ? 'text-danger' : 'text-dark';
+
         $data = [
+            'liked' => $liked,
             'book' => $book,
         ];
 
@@ -192,6 +196,53 @@ class BookController extends Controller
             return back()->with('success', $request->has('note') ? 'note' : 'review' . ' added!');
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
+        }
+    }
+
+
+    public function setCookie($name, $id, $time = 7*24*60): string
+    {
+        $cookie = $this->getCookie($name);
+        if (in_array($id, $cookie)) {
+            $remove = array_search(strval($id), $cookie);
+            unset($cookie[$remove]);
+            Book::query()->findOrFail($id)->decrement('liked');
+            $message = 'disliked';
+        } else {
+            $cookie[] = $id;
+            Book::query()->findOrFail($id)->increment('liked');
+            $message = 'liked';
+        }
+
+        Cookie::queue($name, json_encode($cookie), $time);
+
+        return $message;
+    }
+
+
+    public function getCookie($name): array|string
+    {
+        return Cookie::has($name)
+            ? json_decode(Cookie::get($name), true)
+            : [];
+    }
+
+
+    public function forgetCookie($name): \Symfony\Component\HttpFoundation\Cookie
+    {
+        return Cookie::forget($name);
+    }
+
+
+    public function like($id): JsonResponse
+    {
+        $cookieName = 'likedBooks';
+        try {
+            $message = $this->setCookie($cookieName, $id);
+
+            return response()->json($message, 200);
+        } catch (\Exception $e) {
+            return response()->json(['error', $e->getMessage()], 400);
         }
     }
 }

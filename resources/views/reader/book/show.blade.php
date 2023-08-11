@@ -84,6 +84,13 @@
                     </div>
                 </div>
                 <div class="col p-4">
+
+                    @if($book->isNew())
+                        <div class="badge be-polygon" style="background-color: green">
+                            @lang('lang.new')
+                        </div>
+                    @endif
+
                     <div class="h2 fw-bold" style="font-family: Georgia,'Palatino Linotype','Book Antiqua',Palatino,serif;">{{ $book->name }}</div>
                     <div class="h6">
                         <span class="fst-italic">by</span>
@@ -111,20 +118,32 @@
                             {{ $book->ratedReaders->count() }} {{ $book->ratedReaders->count() > 1 ? 'users' : 'user' }}  rated
                         </span>
                     </div>
-                    <div class="mb-3">
+                    <div class="mb-3 small">
                         @foreach($book->attributeValues as $value)
-                            <div class="small">{{ $value->attribute->name . ': ' . $value->name }}</div>
+                            <div>{{ $value->attribute->name . ': ' . $value->name }}</div>
                         @endforeach
-                        <div class="small">
+                        <div>
                             {!! trans('lang.rent-per-day') . ': ' . $book->priceFormat('price') !!}
 
                             {{-- be-polygon === badge end polygon --}}
-                            <span class="badge text-bg-danger be-polygon">
-                                -{{ $book->discount_percent }}% @lang('lang.off')
-                            </span>
+                            @if($book->isDiscount())
+                                <div class="badge text-bg-danger be-polygon">
+                                    -{{ $book->discount_percent }}% @lang('lang.off')
+                                </div>
+                            @endif
 
                         </div>
-                        <p class="small">{!! trans('lang.damaged-state-of-book') . ': ' . $book->priceFormat('value') !!}</p>
+                        <div>{!! trans('lang.damaged-state-of-book') . ': ' . $book->priceFormat('value') !!}</div>
+                        <div>{{ trans('lang.pages') . ': ' . $book->page }}</div>
+                        <div>{{ trans('lang.written') . ': ' . date_format($book->written_at, 'F, Y') }}</div>
+                        <div>{{ trans('lang.published') . ': ' . date_format($book->published_at, 'F, Y') }}</div>
+                        <div>{{ trans('lang.viewed') . ': ' . $book->viewed }}</div>
+                        <div>
+                            @lang('lang.liked') :
+                            <a href="javascript:void(0);" class="bi-hand-thumbs-up-fill {{ $liked }}" content="like"  id="{{ $book->id }}"></a>
+                            <span id="book{{ $book->id }}">{{ $book->liked }}</span>
+                        </div>
+                        <div>{{ trans('lang.isbn') . ': ' . $book->book_code }}</div>
                     </div>
                     <div class="mb-3">
                         {{ $book->body }}

@@ -130,9 +130,9 @@
 .badge.be-polygon{
     border-radius: 0;
     padding-right: 30px;
-    padding-left: 30px;
-    -webkit-clip-path:polygon(100% 0,calc(100% - var(--ws-sm)) 50%,100% 100%,10px 100%,10px 50%,10px 0);
-    clip-path:polygon(100% 0,calc(100% - var(--ws-sm)) 50%,100% 100%,10px 100%,10px 50%,10px 0);
+    /*padding-left: 30px;*/
+    -webkit-clip-path:polygon(100% 0,calc(100% - var(--ws-sm)) 50%,100% 100%,0 100%,0 50%,0 0);
+    clip-path:polygon(100% 0,calc(100% - var(--ws-sm)) 50%,100% 100%,0 100%,0 50%,0 0);
 }
 .up-badge {
     align-items: center;

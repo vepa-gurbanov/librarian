@@ -5,5 +5,6 @@ return [
     'rent' => 'Rent',
     'day' => 'Day',
     'off' => 'off',
+    'new' => 'New',
     'price' => 'Price',
 ];

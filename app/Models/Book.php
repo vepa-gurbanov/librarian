@@ -213,7 +213,7 @@ class Book extends Model
     }
 
 
-    public function isDiscount()
+    public function isDiscount(): bool
     {
         if ($this->discount_percent > 0 and now()->between($this->discount_starts, $this->discount_ends)) {
             return true;
@@ -223,7 +223,17 @@ class Book extends Model
     }
 
 
-    public function discountPrice()
+    public function isNew(): bool
+    {
+        if ($this->created_at >= Carbon::now()->subMonth()->toDateTimeString()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    public function discountPrice(): float
     {
         return round($this->price * (1 - $this->discount_percent / 100), 1);
     }

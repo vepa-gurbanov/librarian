@@ -10,6 +10,7 @@ use App\Models\Shelf;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
 use function Psy\sh;
 
@@ -87,6 +88,6 @@ class HomeController extends Controller
             session()->put('locale', 'en');
         }
 
-        return redirect()->back();
+        return redirect()->back()->with('success', 'Localization successfully changed!');
     }
 }
