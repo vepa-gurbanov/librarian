@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreign('book_id')->references('id')->on('books')->cascadeOnDelete();
             $table->unsignedBigInteger('reader_id')->index();
             $table->foreign('reader_id')->references('id')->on('readers')->cascadeOnDelete();
-            $table->text('review');
+            $table->text('review')->nullable();
             $table->timestamp('created_at');
         });
     }

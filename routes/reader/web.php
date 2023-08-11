@@ -42,8 +42,7 @@ Route::controller(BookController::class)
         Route::patch('/book/{slug}/update', 'update')->middleware('auth:reader');
         Route::delete('/book/{slug}/delete', 'delete')->name('books.delete')->middleware('auth:reader');
         Route::get('/books/{id}/{rating}', 'rate')->name('books.rate')->middleware('auth:reader');
-        Route::post('/book/{slug}/review', 'review')->name('book.review')->middleware('auth:reader');
-        Route::post('/book/{slug}/note', 'note')->name('book.note')->middleware('auth:reader');
+        Route::post('/book/{slug}/review_note', 'reviewAndNote')->name('book.review.note')->middleware('auth:reader');
     });
 
 Route::get('shelves/{id}/products', [ShelfController::class, 'shelfBooks'])->name('shelves.books');

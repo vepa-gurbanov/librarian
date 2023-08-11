@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -20,10 +21,20 @@ class Book extends Model
     public $translatable = ['name', 'full_name', 'body', 'description'];
 
     protected $casts = [
+        'discount_starts' => 'datetime',
+        'discount_ends' => 'datetime',
         'written_at' => 'date',
         'published_at' => 'date',
     ];
 
+    const enumKeywords = [
+        'books.condition' => ['new', 'used', 'old', 'fragile', 'delisted'],
+        'documents.identity_type' => ['passport', 'driver_license', 'military_ticket', 'birth_certificate'],
+        'registrations.reader_status' => ['reading', 'completed'],
+        'registrations.book_status' => ['poor', 'good'],
+        'registrations.payment_type' => ['online', 'terminal', 'cash'],
+        'options.type' => ['electron', 'audiobook'],
+    ];
 
     protected static function booted()
     {
@@ -202,15 +213,34 @@ class Book extends Model
     }
 
 
-//    public function putOptions($type, array $val) {
-//        foreach (json_decode($this->options) as $key => $option) {
-//            if ($this->option->->type === $type) {
-//                if (isset($val['src'])) $option->src = $val['src'];
-//                if (isset($val['price'])) $option->price = $val['price'];
-//                $this->update();
-//            }
-//        }
-//        return $this->update();
-//    }
+    public function isDiscount()
+    {
+        if ($this->discount_percent > 0 and now()->between($this->discount_starts, $this->discount_ends)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
+
+    public function discountPrice()
+    {
+        return round($this->price * (1 - $this->discount_percent / 100), 1);
+    }
+
+
+    public function priceFormat($type, $class = ''): string
+    {
+        $price = $type === 'price' ? $this->price : $this->value;
+        if ($this->isDiscount() && $type === 'price') {
+            $discountSpan = ' / <span class="text-success fw-semibold">' . number_format($this->discountPrice(), 2) . '</span>';
+            $class = 'cancel-price';
+        } else {
+            $discountSpan = '';
+        }
+
+        $currencyClass = 'small-sm font-monospace';
+
+        return '<span class="' . $class . '">' . number_format($price, 2) . '</span>' . $discountSpan . '<span class="' . $currencyClass . '"> TMT</span>';
+    }
 }

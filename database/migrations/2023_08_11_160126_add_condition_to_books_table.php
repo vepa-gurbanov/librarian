@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('reviews', function (Blueprint $table) {
-            $table->text('note')->nullable()->after('review');
+        Schema::table('books', function (Blueprint $table) {
+            $table->enum('condition', ['new', 'used', 'old', 'fragile', 'delisted'])->default('new')->after('viewed');
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('reviews', function (Blueprint $table) {
-            $table->dropColumn('note');
+        Schema::table('books', function (Blueprint $table) {
+            $table->dropColumn('condition');
         });
     }
 };

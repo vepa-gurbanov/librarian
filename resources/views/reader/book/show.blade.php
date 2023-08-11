@@ -1,9 +1,11 @@
+@if(!isset($book)) {{ abort(404) }} @endif
 @extends('reader.layouts.app')
 @section('title')
     {{ $book->name }}
 @endsection
 @section('content')
     <link rel="stylesheet" href="{{ asset('css/rating.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/badge.css') }}">
     <main class="container-xl mt-3">
         <div class="bg-secondary-subtle rounded">
             <div class="d-flex justify-content-between">
@@ -21,7 +23,7 @@
                                 <div class="modal-dialog">
                                     <div class="modal-content">
                                         <div class="modal-body">
-                                            <form action="{{ route('book.note', $book->slug) }}" method="POST">
+                                            <form action="{{ route('book.review.note', $book->slug) }}" method="POST">
                                                 @method('POST')
                                                 @csrf
                                                 <textarea class="form-control bg-body-tertiary" name="note" id="bookNote{{ $book->id }}" cols="30" rows="10"></textarea>
@@ -45,7 +47,7 @@
                                 <div class="modal-dialog">
                                     <div class="modal-content">
                                         <div class="modal-body">
-                                            <form action="{{ route('book.review', $book->slug) }}" method="POST">
+                                            <form action="{{ route('book.review.note', $book->slug) }}" method="POST">
                                                 @method('POST')
                                                 @csrf
                                                 <textarea class="form-control bg-body-tertiary" name="review" id="bookReview{{ $book->id }}" cols="30" rows="10"></textarea>
@@ -77,7 +79,7 @@
                     </div>
                     <div class="mb-3">
                         <a href="#" class="btn btn-sm btn-primary w-100">
-                            Rent: {{ number_format($book->price, '2') }} <span class="small-sm">TMT</span>
+                            @lang('lang.rent-per-day'): {!! $book->priceFormat($book->price) !!}
                         </a>
                     </div>
                 </div>
@@ -111,8 +113,18 @@
                     </div>
                     <div class="mb-3">
                         @foreach($book->attributeValues as $value)
-                            <p class="small">{{ $value->attribute->name . ': ' . $value->name }}</p>
+                            <div class="small">{{ $value->attribute->name . ': ' . $value->name }}</div>
                         @endforeach
+                        <div class="small">
+                            {!! trans('lang.rent-per-day') . ': ' . $book->priceFormat('price') !!}
+
+                            {{-- be-polygon === badge end polygon --}}
+                            <span class="badge text-bg-danger be-polygon">
+                                -{{ $book->discount_percent }}% @lang('lang.off')
+                            </span>
+
+                        </div>
+                        <p class="small">{!! trans('lang.damaged-state-of-book') . ': ' . $book->priceFormat('value') !!}</p>
                     </div>
                     <div class="mb-3">
                         {{ $book->body }}
@@ -155,62 +167,66 @@
                                 </div>
                             </div>
 
-                            <p class="d-inline-flex gap-1">
-                                <a data-bs-toggle="collapse" href="#collapseReview" role="button" aria-expanded="false" aria-controls="collapseReview">
-                                    Show more
-                                </a>
-                            </p>
-                            <div class="collapse" id="collapseReview">
-                                <div class="card card-body bg-transparent border-0">
-                                    @foreach($book->reviews as $review)
-                                        @continue($loop->first)
-                                        <div class="mb-3 border-bottom small">
-                                            <span>{{ $review->reader->name }}</span>
-                                            <div class="ms-3">
-                                                <p class="mb-1">- {{ $review->review }}</p>
-                                                <span class="small-sm">{{ date_format($review->created_at, 'Y-m-d | H:i:s') }}</span>
+                            @if($book->reviews->count() > 1)
+                                <p class="d-inline-flex gap-1">
+                                    <a data-bs-toggle="collapse" href="#collapseReview" role="button" aria-expanded="false" aria-controls="collapseReview">
+                                        Show more
+                                    </a>
+                                </p>
+                                <div class="collapse" id="collapseReview">
+                                    <div class="card card-body bg-transparent border-0">
+                                        @foreach($book->reviews as $review)
+                                            @continue($loop->first)
+                                            <div class="mb-3 border-bottom small">
+                                                <span>{{ $review->reader->name }}</span>
+                                                <div class="ms-3">
+                                                    <p class="mb-1">- {{ $review->review }}</p>
+                                                    <span class="small-sm">{{ date_format($review->created_at, 'Y-m-d | H:i:s') }}</span>
+                                                </div>
                                             </div>
-                                        </div>
-                                    @endforeach
+                                        @endforeach
+                                    </div>
                                 </div>
-                            </div>
+                            @endif
+
                         </div>
                     @endif
 
                     @if($book->notes->count() > 0)
                         <div class="mb-3">
-                            <p class="mb-1">Notes:</p>
+                            <p class="mb-1">My Notes:</p>
 
                             @php $latest = $book->notes->first(); @endphp
                             <div class="mb-3 border-bottom small">
-                                <span>{{ $latest->reader->name }}</span>
+                                {{--                                <span>{{ $latest->reader->name }}</span>--}}
                                 <div class="ms-3">
                                     <p class="mb-1">- {{ $latest->note }}</p>
                                     <span class="small-sm">{{ date_format($latest->created_at, 'Y-m-d | H:i:s') }}</span>
                                 </div>
                             </div>
 
-                            <p class="d-inline-flex gap-1">
-                                <a data-bs-toggle="collapse" href="#collapseNote" role="button" aria-expanded="false" aria-controls="collapseNote">
-                                    Show more
-                                </a>
-                            </p>
-                            <div class="collapse" id="collapseNote">
-                                <div class="card card-body bg-transparent border-0">
-                                    @foreach($book->notes as $note)
-                                        @continue($loop->first)
-                                        <div class="mb-3 border-bottom small">
-                                            <span>{{ $note->reader->name }}</span>
-                                            <div class="ms-3">
-                                                <p class="mb-1">- {{ $note->note }}</p>
-                                                <span class="small-sm">{{ date_format($note->created_at, 'Y-m-d | H:i:s') }}</span>
+                            @if($book->notes->count() > 1)
+                                <p class="d-inline-flex gap-1">
+                                    <a data-bs-toggle="collapse" href="#collapseNote" role="button" aria-expanded="false" aria-controls="collapseNote">
+                                        Show more
+                                    </a>
+                                </p>
+                                <div class="collapse" id="collapseNote">
+                                    <div class="card card-body bg-transparent border-0">
+                                        @foreach($book->notes as $note)
+                                            @continue($loop->first)
+                                            <div class="mb-3 border-bottom small">
+                                                {{--                                            <span>{{ $note->reader->name }}</span>--}}
+                                                <div class="ms-3">
+                                                    <p class="mb-1">- {{ $note->note }}</p>
+                                                    <span class="small-sm">{{ date_format($note->created_at, 'Y-m-d | H:i:s') }}</span>
+                                                </div>
                                             </div>
-                                        </div>
-
-                                    @endforeach
-
+                                        @endforeach
+                                    </div>
                                 </div>
-                            </div>
+                            @endif
+
                         </div>
                     @endif
 

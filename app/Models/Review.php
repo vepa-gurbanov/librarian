@@ -12,7 +12,7 @@ class Review extends Model
 
     const UPDATED_AT = null;
 
-    protected $fillable = ['book_id', 'reader_id', 'review'];
+    protected $fillable = ['book_id', 'reader_id', 'review', 'note'];
 
 
     public function book(): BelongsTo

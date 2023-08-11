@@ -175,32 +175,21 @@ class BookController extends Controller
     }
 
 
-    public function review(Request $request, $slug) {
-        $request->validate(['review' => ['required', 'string', 'max:2550']]);
+    public function reviewAndNote(Request $request, $slug): \Illuminate\Http\RedirectResponse
+    {
+        $request->validate([
+            'review' => ['sometimes', 'string', 'max:2550'],
+            'note' => ['sometimes', 'string', 'max:2550'],
+        ]);
 
         try {
             Review::create([
                 'book_id' => Book::query()->where('slug', $slug)->firstOrFail()->id,
                 'reader_id' => auth('reader')->id(),
-                'review' => $request->review,
+                'review' => $request->has('review') ? $request->review : null,
+                'note' => $request->has('note') ? $request->note : null,
             ]);
-            return back()->with('success', 'Review added!');
-        } catch (\Exception $e) {
-            return back()->with('error', $e->getMessage());
-        }
-    }
-
-
-    public function note(Request $request, $slug) {
-        $request->validate(['note' => ['required', 'string', 'max:2550']]);
-
-        try {
-            Review::create([
-                'book_id' => Book::query()->where('slug', $slug)->firstOrFail()->id,
-                'reader_id' => auth('reader')->id(),
-                'note' => $request->note,
-            ]);
-            return back()->with('success', 'Note added!');
+            return back()->with('success', $request->has('note') ? 'note' : 'review' . ' added!');
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
         }

@@ -19,7 +19,7 @@
                             <li><a class="dropdown-item bi-arrow-left-short" href="javascript:void(0);" onclick="$('form#ReaderLogoutForm').submit();">Logout</a></li>
                         </ul>
                     @else
-                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">Create Account</a>
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">Account</a>
                         <ul class="dropdown-menu" style="max-width: 1080px; max-height: 480px">
                             <li><a class="dropdown-item" href="{{ route('login') }}">Login</a></li>
                             <li><a class="dropdown-item" href="{{ route('register') }}">Register</a></li>
