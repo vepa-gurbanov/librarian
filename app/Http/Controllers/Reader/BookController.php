@@ -151,13 +151,12 @@ class BookController extends Controller
             ->with('ratedReaders', 'attributeValues.attribute', 'options', 'reviews.reader', 'notes.reader')->first();
 
         $liked = in_array($book->id, $this->getCookie('likedBooks')) ? 'text-danger' : 'text-dark';
+        $this->setCookie('viewedBooks', $book->id, ['success' => 'Added to viewed list', 'error' => 'Already in the viewed list'], 'viewed');
 
         $data = [
             'liked' => $liked,
             'book' => $book,
         ];
-
-//        return $book->notes->count();
 
         return view('reader.book.show')->with($data);
     }
@@ -200,23 +199,25 @@ class BookController extends Controller
     }
 
 
-    public function setCookie($name, $id, $time = 7*24*60): string
+    public function setCookie($name, $id, $message, $column = 'liked', $time = 7*24*60): string
     {
         $cookie = $this->getCookie($name);
         if (in_array($id, $cookie)) {
-            $remove = array_search(strval($id), $cookie);
-            unset($cookie[$remove]);
-            Book::query()->findOrFail($id)->decrement('liked');
-            $message = 'disliked';
+            if ($column === 'liked') {
+                $remove = array_search(strval($id), $cookie);
+                unset($cookie[$remove]);
+                Book::query()->findOrFail($id)->decrement($column);
+            }
+            $m = $message['error'];
         } else {
             $cookie[] = $id;
-            Book::query()->findOrFail($id)->increment('liked');
-            $message = 'liked';
+            Book::query()->findOrFail($id)->increment($column);
+            $m = $message['success'];
         }
 
         Cookie::queue($name, json_encode($cookie), $time);
 
-        return $message;
+        return $m;
     }
 
 
@@ -238,7 +239,10 @@ class BookController extends Controller
     {
         $cookieName = 'likedBooks';
         try {
-            $message = $this->setCookie($cookieName, $id);
+            $message = $this->setCookie($cookieName, $id, [
+                'error' => 'disliked',
+                'success' => 'liked',
+            ]);
 
             return response()->json($message, 200);
         } catch (\Exception $e) {

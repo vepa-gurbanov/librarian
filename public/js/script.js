@@ -164,8 +164,8 @@ function like() {
 
                 // Live toast
                 const toastBootstrap = bootstrap.Toast.getOrCreateInstance($('#liveToast'))
-                let toast = $('#liveToast .toast-body');
-                toast.addClass('toast-body bg-success-subtle text-success-emphasis rounded').text(response);
+                $('#liveToast .toast-body').addClass('toast-body bg-success-subtle text-success-emphasis rounded');
+                $('#liveToast .toast-body span#content').text(response);
                 toastBootstrap.show()
                 // Live toast
 
@@ -177,3 +177,11 @@ function like() {
     });
 }
 like();
+function hideAlertToast() {
+    if ($(document).has('#toast')) {
+        setTimeout(function () {
+            $('#toast').fadeOut();
+        }, 3000)
+    }
+}
+hideAlertToast();
