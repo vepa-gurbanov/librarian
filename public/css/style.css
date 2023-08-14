@@ -1,6 +1,26 @@
 .border-end, .border-bottom, .border-top, .border-start, .border {
-    --bs-border-color: white !important;
+    --bs-border-color: #86b7fe !important;
 }
+.bordered{
+    border-color:#86b7fe;
+    outline:0;
+    /*box-shadow:0 0 0 .25rem rgba(13,110,253,.25);*/
+}
+/* trigger */
+.trigger {
+    display: inline-block;
+}
+
+.hoverable, .trigger {
+    transition: box-shadow 0.55s;
+    box-shadow: 0;
+}
+
+.hoverable:hover, .trigger:hover {
+    transition: box-shadow 0.45s;
+    box-shadow: 0 8px 17px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+/* trigger */
 
 /* Start Swiper */
 .swiper {
@@ -264,4 +284,12 @@ body {
 }
 .bd-mode-toggle {
     z-index: 1500;
+}
+
+
+/* DT paginations */
+.paging_simple_numbers{
+    position:relative;display:inline-flex;vertical-align:middle;
+    flex:1 1 auto;
+
 }

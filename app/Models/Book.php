@@ -12,11 +12,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Laravel\Scout\Searchable;
 use Spatie\Translatable\HasTranslations;
 
 class Book extends Model
 {
-    use HasFactory, HasTranslations;
+    use HasFactory, HasTranslations, Searchable;
 
     public $translatable = ['name', 'full_name', 'body', 'description'];
 
@@ -253,4 +254,25 @@ class Book extends Model
 
         return '<span class="' . $class . '">' . number_format($price, 2) . '</span>' . $discountSpan . '<span class="' . $currencyClass . '"> TMT</span>';
     }
+
+
+    public function toSearchableArray()
+    {
+        $array = $this->toArray();
+
+        $array = $this->transform($array);
+
+        $array['options'] = $this->options->pluck('type', 'format')->toArray();
+
+        $array['categories'] = $this->categories->map(function ($data) {
+            return $data['name'];
+        })->toArray();
+
+        $array['publishers'] = $this->publishers->map(function ($data) {
+            return $data['name'];
+        })->toArray();
+
+        return $array;
+    }
+
 }

@@ -18,7 +18,6 @@ class HomeController extends Controller
 {
     public function index(Request $request)
     {
-        $request->validate(['q' => ['nullable', 'string']]);
         $top = Book::query()
             ->orderBy('liked', 'desc')
             ->take(10)
@@ -34,34 +33,7 @@ class HomeController extends Controller
             ->take(10)
             ->get(['id', 'name', 'image', 'books_count']);
 
-
-        if ($request->has('q')) {
-            $q = $request->q;
-            $books = Book::query()
-                ->where('name', 'like', '%' . $q . '%')
-                ->orWhere('full_name', 'like', '%' . $q . '%')
-                ->orWhere('slug', 'like', '%' . $q . '%')
-                ->orWhere('barcode', 'like', '%' . $q . '%')
-                ->orWhere('book_code', 'like', '%' . $q . '%')
-                ->whereHas('authors', function ($query) use ($q) {
-                    $query->where('name', 'like', '%' . $q . '%');
-                })
-                ->whereHas('categories', function ($query) use ($q) {
-                    $query->where('name', 'like', '%' . $q . '%');
-                })
-                ->whereHas('publishers', function ($query) use ($q) {
-                    $query->where('name', 'like', '%' . $q . '%');
-                })
-                ->orderBy('id')
-                ->with('categories:id,slug,name')
-                ->paginate(24, ['id', 'name', 'slug', 'price', 'page', 'liked'])
-                ->withQueryString();
-        } else {
-            $books = [];
-        }
-
         $data = [
-            'books' => $books,
             'swiperContent' => [
                 'top' => [
                     'data' => $top,

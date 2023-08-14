@@ -9,17 +9,20 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Laravel\Scout\Searchable;
 use Spatie\Translatable\HasTranslations;
 
 class Category extends Model
 {
-    use HasFactory, HasTranslations;
+    use HasFactory, HasTranslations, Searchable;
 
     protected $guarded = ['id', 'parent_id'];
 
     public $timestamps = false;
 
     public $translatable = ['name'];
+
+    protected $touches = ['books'];
 
 
     protected static function booted()

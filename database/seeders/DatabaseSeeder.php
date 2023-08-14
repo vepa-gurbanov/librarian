@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Book;
 use App\Models\Publisher;
 use Illuminate\Database\Seeder;
 
@@ -49,8 +50,14 @@ class DatabaseSeeder extends Seeder
 
     public function run(): void
     {
+        Book::disableSearchSyncing();
+
         $this->authFactory();
         $this->bookFactory();
         $this->registrationFactory();
+
+        Book::all()->searchable();
+        Book::enableSearchSyncing();
+
     }
 }

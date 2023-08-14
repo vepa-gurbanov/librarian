@@ -1,12 +1,14 @@
-const $ = jQuery;
 $(document).ready(function () {
-    $.noConflict();
-
+    $('input, textarea').addClass('bordered');
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf_token"]').attr('content')
         }
     });
+
+    $('table.dataTable').each(function () {
+        initDatatables('#' + $(this).attr('id'), $(this).attr('searchable'));
+    })
 
 });
 (() => {
@@ -35,12 +37,13 @@ function swiperSlider() {
         },
     });
 }
+
 swiperSlider();
 
 function swiperMain() {
-    $('.swiperContent').each(function(){
+    $('.swiperContent').each(function () {
         let swiper = $(this).attr('id');
-        new Swiper( '#' + swiper, {
+        new Swiper('#' + swiper, {
             slidesPerView: 5,
             spaceBetween: 30,
             grabCursor: true,
@@ -61,6 +64,7 @@ function swiperMain() {
         });
     });
 }
+
 swiperMain();
 
 function swiperAuthors() {
@@ -81,7 +85,7 @@ swiperAuthors();
 $('button#searchbar').on('click', function () {
     let q = $('input#searchbar').val();
     let form = $('form#bookFilter');
-    let input = '<input type="hidden" name="q" value="'+q+'">';
+    let input = '<input type="hidden" name="q" value="' + q + '">';
     form.append(input);
     form.submit();
 });
@@ -109,17 +113,16 @@ function rate() {
         let rating = $(this).val();
         let id = $('input:hidden[name=bookID]').val();
         $.ajax({
-            url: 'http://127.0.0.1:8000/books/'+id+'/'+rating,
+            url: 'http://127.0.0.1:8000/books/' + id + '/' + rating,
             method: 'GET',
             dataType: 'JSON',
             processData: false,
-            success:function(response) {
+            success: function (response) {
                 location.reload();
                 console.log(response);
             },
-            error:function (response, error) {
-                if (response.statusText === 'Forbidden')
-                {
+            error: function (response, error) {
+                if (response.statusText === 'Forbidden') {
                     location.replace('http://127.0.0.1:8000/0auth1');
                 }
                 console.log(response.statusText);
@@ -129,17 +132,26 @@ function rate() {
 }
 rate()
 
-function aCollapse() {
-    let aCollapse = $('a[data-bs-toggle="collapse"]');
-    aCollapse.on('click', function () {
-        if (aCollapse.attr('aria-expanded') === 'false') {
-            aCollapse.text('Show more');
-        } else if (aCollapse.attr('aria-expanded') === 'true') {
-            aCollapse.text('Show less');
+function collapse() {
+    let collapse = $('a[data-bs-toggle="collapse"]');
+    let text = collapse.text();
+    collapse.on('click', function () {
+        if (collapse.attr('aria-expanded') === 'false') {
+            if (text !== 'Show more') {
+                collapse.text(text + ' (Show)');
+            } else {
+                collapse.text('Show more');
+            }
+        } else if (collapse.attr('aria-expanded') === 'true') {
+            if (text !== 'Show less') {
+                collapse.text(text + ' (Hide)');
+            } else {
+                collapse.text('Show less');
+            }
         }
     })
 }
-aCollapse();
+collapse();
 
 
 function like() {
@@ -177,6 +189,7 @@ function like() {
     });
 }
 like();
+
 function hideAlertToast() {
     if ($(document).has('#toast')) {
         setTimeout(function () {
@@ -185,3 +198,71 @@ function hideAlertToast() {
     }
 }
 hideAlertToast();
+
+/* Starts live search */
+$('.scrollbar').each(function () {
+    var search = 'search_' + $(this).attr('content');
+    var scroll = $(this).attr('content') + 'Scroll';
+
+    $('#' + search).keyup(function () {
+
+        // Retrieve the input field text and reset the count to zero
+        var filter = $(this).val();
+        // Loop through the comment list
+        $("div.scrollbar#" + scroll + " div#filterContent").each(function () {
+
+
+            // If the list item does not contain the text phrase fade it out
+            if ($(this).text().search(new RegExp(filter, "i")) < 0) {
+                $(this).fadeOut();
+
+                // Show the list item if the phrase matches and increase the count by 1
+            } else {
+                $(this).show();
+            }
+        });
+
+    });
+});
+/* End live search */
+
+
+function initDatatables(selector, searchable = false) {
+    if (searchable) {
+        $(selector + " tfoot th").each(function () {
+            var title = $(this).text();
+            $(this).html('<input type="text" class="form-control form-control-sm bordered" placeholder="Search ' + title + '" />');
+        });
+
+        var table = $(selector).DataTable({
+            dom: '<"dt-buttons"Bf><"clear">lirtp',
+            paging: true,
+            autoWidth: true,
+            buttons: [
+                "colvis",
+                "copyHtml5",
+                "csvHtml5",
+                "excelHtml5",
+                "pdfHtml5",
+                "print"
+            ],
+            initComplete: function (settings, json) {
+                var footer = $(selector + " tfoot tr");
+                $(selector + " thead").append(footer);
+            }
+        });
+
+        $(selector + " thead").on("keyup", "input", function () {
+            table.column($(this).parent().index())
+                .search(this.value)
+                .draw();
+        });
+    } else {
+        $(selector).DataTable();
+    }
+}
+
+
+$('td a[content=like]').on('click', function () {
+    $(this).closest('tr').fadeOut();
+})

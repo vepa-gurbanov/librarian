@@ -97,7 +97,7 @@
                         @foreach($book->authors as $author)
                             <a href="{{ route('books.index', ['au' => [[$author->id]]]) }}">{{ $author->name }}</a> {{ !$loop->last ? ', ': '' }}
                         @endforeach
-                        <span class="fst-italic">( {{ date_format($book->published_at, 'Y') }}
+                        <span class="fst-italic">( {{ date_format($book->published_at, 'Y') }},
                             @if(!empty($book->publishedCountries()))
                                 {{ implode(', ', $book->publishedCountries()) }}
                             @endif
@@ -112,10 +112,10 @@
                             {{ number_format($book->averageRating(), 1) }}
                         </span> ·
                         <span>
-                            {{ $book->totalRatings() }} ratings total
+                            @lang('lang.ratings-total', ['rating' => $book->totalRatings()])
                         </span> ·
                         <span>
-                            {{ $book->ratedReaders->count() }} {{ $book->ratedReaders->count() > 1 ? 'users' : 'user' }}  rated
+                            {{ $book->ratedReaders->count() }} @lang('lang.user-rated')
                         </span>
                     </div>
                     <div class="mb-3 small">
@@ -150,23 +150,23 @@
                     </div>
                     @if($book->options->count() > 0)
                         <div class="mb-3">
-                            <p class="mb-1">Options:</p>
+                            <p class="mb-1">@lang('lang.options'):</p>
 
                             <div class="d-inline-flex justify-content-between">
                                 @foreach($book->options as $option)
                                     <div class="col-auto w-100 card shadow rounded m-1 p-2 bg-body-secondary">
-                                        <div class="small"><span>Type: </span>{{ $option->type }}</div>
-                                        <div class="small"><span>Format: </span>{{ $option->format }}</div>
-                                        <div class="small"><span>Volume: </span>{{ $option->volume }} mb</div>
-                                        <div class="small"><span>Price: </span>{{ number_format($option->price, '2') }} <span class="small-sm">TMT</span></div>
-                                        <a href="#" class="btn btn-sm btn-primary">Download {{ $option->type === 'electron' ? 'PDF' : strtoupper($option->type) }}</a>
+                                        <div class="small"><span>@lang('lang.type'): </span>{{ $option->type }}</div>
+                                        <div class="small"><span>@lang('lang.format'): </span>{{ $option->format }}</div>
+                                        <div class="small"><span>@lang('lang.volume'): </span>{{ $option->volume }} mb</div>
+                                        <div class="small"><span>@lang('lang.price'): </span>{{ number_format($option->price, '2') }} <span class="small-sm">TMT</span></div>
+                                        <a href="#" class="btn btn-sm btn-primary">@lang('lang.download') {{ $option->type === 'electron' ? 'PDF' : strtoupper($option->type) }}</a>
                                     </div>
                                 @endforeach
                             </div>
                             <div class="mb-3">
                                 <a href="#" class="btn btn-outline-primary m-1">
                                     <span class="bi-gift-fill text-danger"></span>
-                                    <span class="text-danger">Bundle:</span> {{ $book->options->sum('price') + $book->price }}
+                                    <span class="text-danger">@lang('lang.bundle'):</span> {{ $book->options->sum('price') + $book->price }}
                                     <span class="small-sm">TMT</span>
                                 </a>
                             </div>
@@ -175,7 +175,7 @@
 
                     @if($book->reviews->count() > 0)
                         <div class="mb-3">
-                            <p class="mb-1">Reviews:</p>
+                            <p class="mb-1">@lang('lang.reviews'):</p>
 
                             @php $latest = $book->reviews->first(); @endphp
                             <div class="mb-3 border-bottom small">
@@ -213,7 +213,7 @@
 
                     @if($book->notes->count() > 0)
                         <div class="mb-3">
-                            <p class="mb-1">My Notes:</p>
+                            <p class="mb-1">@lang('lang.my-notes'):</p>
 
                             @php $latest = $book->notes->first(); @endphp
                             <div class="mb-3 border-bottom small">
@@ -250,6 +250,25 @@
                     @endif
 
                 </div>
+            </div>
+        </div>
+        <div class="my-3 bg-body-secondary rounded p-2">
+            <div>
+                <span>@lang('lang.related-books') <i class="bi-arrow-right-short"></i></span>
+                @foreach($book->authors as $author)
+                    <a href="{{ route('books.index', ['au' => [[$author->id]]]) }}" class="badge bg-primary rounded-pill text-decoration-none trigger">{{ $author->name }}</a>
+                @endforeach
+                @foreach($book->categories as $category)
+                    <a href="{{ route('books.index', ['c' => [[$category->id]]]) }}" class="badge bg-primary rounded-pill text-decoration-none trigger">{{ $author->name }}</a>
+                @endforeach
+                <hr>
+            </div>
+            <div class="row row-cols-3 row-cols-md-4 row-cols-xl-5 g-4 mb-4">
+                @foreach($similars as $book)
+                    <div class="col">
+                        @include('reader.app.book')
+                    </div>
+                @endforeach
             </div>
         </div>
     </main>

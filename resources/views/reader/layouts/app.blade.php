@@ -10,6 +10,9 @@
     <link rel="stylesheet" href="{{ asset('css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('css/swiper-bundle.min.css') }}">
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+
+    <link rel="stylesheet" href="{{ asset('assets/datatables/dataTables.bootstrap5.min.css') }}">
+
 </head>
 <body class="bg-body-tertiary">
 @include('reader.app.navbar')
@@ -18,8 +21,15 @@
 <script type="text/javascript" src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('js/swiper-bundle.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('js/jquery.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/jquery.easing.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('js/color-modes.js') }}"></script>
 <script type="text/javascript" src="{{ asset('js/script.js') }}"></script>
+
+<script type="text/javascript" src="{{ asset('assets/datatables/dataTables.bootstrap5.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('assets/datatables/jquery.dataTables.min.js') }}"></script>
+
+
+<script type="text/babel" src="{{ asset('js/algolia/algolia-search.jsx') }}"></script>
 </body>
 </html>
 

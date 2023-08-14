@@ -13,7 +13,15 @@
     <div class="mb-1">
         {{ $book->name }}
     </div>
-    <div class="text-center fw-semibold bg-success-subtle rounded d-block mt-auto;">
-        <a href="" class="text-decoration-none text-success-emphasis">Rent: {{ number_format($book->price, '2', '.') }} <span class="font-monospace">TMT</span></a>
+    <div class="d-block mt-auto">
+        @php
+            $liked = in_array($book->id, json_decode(\Illuminate\Support\Facades\Cookie::get('likedBooks'), true)) ? 'text-danger' : 'text-dark';
+        @endphp
+        <span class="text-center fw-semibold bg-success-subtle rounded-start me-1 ps-1">
+        <a href="javascript:void(0);" class="bi-hand-thumbs-up-fill {{ $liked }}" content="like"  id="{{ $book->id }}"></a>
+        </span>
+        <span class="text-center fw-semibold bg-success-subtle rounded-end px-1">
+        <a href="#" class="text-decoration-none text-success-emphasis">Rent: {!! $book->priceFormat('price') !!}</a>
+        </span>
     </div>
 </div>

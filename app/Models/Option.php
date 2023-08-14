@@ -5,10 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Laravel\Scout\Searchable;
 
 class Option extends Model
 {
-    use HasFactory;
+    use HasFactory, Searchable;
 
     public $timestamps = false;
 
@@ -18,6 +19,8 @@ class Option extends Model
         'electron' => ['pdf', 'epub'],
         'audiobook' => ['mp3']
     ];
+
+    protected $touches = ['book'];
 
 
     public function book(): BelongsTo

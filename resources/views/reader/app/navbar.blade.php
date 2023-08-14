@@ -7,28 +7,13 @@
         </div>
         <div class="d-flex">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                @auth('reader')
+                    <li class="nav-item">
+                        <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">Dashboard</a>
+                    </li>
+                @endauth
                 <li class="nav-item dropdown">
-                    @auth('reader')
-                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">My account</a>
-                        <form action="{{ route('logout') }}" method="POST" id="ReaderLogoutForm">
-                            @csrf
-                            @honeypot
-                        </form>
-                        <ul class="dropdown-menu" style="max-width: 1080px; max-height: 480px">
-                            <li><a class="dropdown-item" href="{{ route('dashboard') }}">Dashboard</a></li>
-                            <li><a class="dropdown-item bi-arrow-left-short" href="javascript:void(0);" onclick="$('form#ReaderLogoutForm').submit();">Logout</a></li>
-                        </ul>
-                    @else
-                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">Account</a>
-                        <ul class="dropdown-menu" style="max-width: 1080px; max-height: 480px">
-                            <li><a class="dropdown-item" href="{{ route('login') }}">Login</a></li>
-                            <li><a class="dropdown-item" href="{{ route('register') }}">Register</a></li>
-                        </ul>
-                    @endif
-                </li>
-
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">Books</a>
+                    <a class="nav-link {{ request()->routeIs('books.index') ? 'active' : '' }} dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">Books</a>
                     <ul class="dropdown-menu" style="max-width: 1080px; max-height: 480px">
                         <li>
                             <a class="dropdown-item" href="{{ route('books.index') }}">
@@ -47,7 +32,7 @@
                 </li>
 
                 <li class="nav-item dropdown-center">
-                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">Shelves</a>
+                    <a class="nav-link {{ request()->routeIs('shelves.*') ? 'active' : '' }} dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">Shelves</a>
                     <div class="dropdown-menu" style="width: 610px; height: 210px">
                         <div class="row row-cols-3 row-cols-md-4 row-cols-xl-5">
                             <div class="col-auto">
@@ -93,9 +78,28 @@
         </div>
         <!-- //. end Language -->
 
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+            @auth('reader')
+                <form action="{{ route('logout') }}" method="POST" id="ReaderLogoutForm">
+                    @csrf
+                    @honeypot
+                </form>
+                <li class="nav-item">
+                    <a class="nav-link bi-arrow-left-square-fill" href="javascript:void(0);" onclick="$('form#ReaderLogoutForm').submit();"> Logout</a>
+                </li>
+            @else
+                <li class="nav-item">
+                    <span class="d-inline-flex">
+                    <a class="nav-link" href="{{ route('login') }}">Login</a> <span class="text-white nav-link">/</span> <a class="nav-link" href="{{ route('register') }}">Register</a>
+
+                </span>
+                </li>
+            @endif
+        </ul>
+
         <form class="d-flex" role="search" method="GET" action="{{ route('home') }}">
             <div class="input-group">
-                <input type="text" class="form-control rounded-pill rounded-end-0" placeholder="Search.." value="{{ request()->has('q') ? request('q') : '' }}" />
+                <input type="text" class="form-control rounded-pill rounded-end-0" name="instant_search" placeholder="Search.." />
                 <button type="submit" class="input-group-text bg-primary rounded-pill rounded-start-0"><i class="bi-search"></i></button>
             </div>
         </form>

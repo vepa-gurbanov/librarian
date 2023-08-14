@@ -9,6 +9,7 @@ use App\Models\Book;
 use App\Models\Category;
 use App\Models\Publisher;
 use App\Models\Review;
+use \Illuminate\Database\Query\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
@@ -104,8 +105,8 @@ class BookController extends Controller
             })
             ->orderByDesc('id')
             ->with('categories:id,slug,name')
-            ->paginate(24, ['id', 'name', 'slug', 'price', 'page', 'liked', 'image'])
-            ->withQueryString();
+            ->paginate(10, ['id', 'name', 'slug', 'price', 'page', 'liked', 'image'])
+            ->appends($request->query());
 
         $maxPrice = Book::orderByDesc('price')->first()->price;
         $searchCategories = Category::orderBy('id')
@@ -122,15 +123,14 @@ class BookController extends Controller
             ->with('values:id,attribute_id,name')
             ->get(['id', 'name']);
 
-
         $data = [
             'q' => $q,
             'f_min_price' => $f_min_price,
             'f_max_price' => $f_max_price,
             'f_order' => $f_order,
-            'f_categories' => collect($f_categories),
-            'f_publishers' => collect($f_publishers),
-            'f_authors' => collect($f_authors),
+            'f_categories' => collect($f_categories)->collapse(),
+            'f_publishers' => collect($f_publishers)->collapse(),
+            'f_authors' => collect($f_authors)->collapse(),
             'f_values' => collect($f_values)->collapse(),
             'maxPrice' => $maxPrice,
             'searchCategories' => $searchCategories,
@@ -147,13 +147,26 @@ class BookController extends Controller
     }
 
     public function show(string $slug) {
-        $book = Book::where('slug', $slug)
-            ->with('ratedReaders', 'attributeValues.attribute', 'options', 'reviews.reader', 'notes.reader')->first();
+        $book = Book::query()->where('slug', $slug)
+            ->with('ratedReaders', 'attributeValues.attribute', 'options', 'reviews.reader', 'notes.reader', 'categories:id,name,slug', 'authors')->first();
 
         $liked = in_array($book->id, $this->getCookie('likedBooks')) ? 'text-danger' : 'text-dark';
         $this->setCookie('viewedBooks', $book->id, ['success' => 'Added to viewed list', 'error' => 'Already in the viewed list'], 'viewed');
 
+        $similars = Book::query()
+            ->whereHas('categories', function ($q) use ($book) {
+                $q->whereIn('id', $book->categories()->pluck('id')->toArray());
+            })
+            ->whereHas('authors', function ($q) use ($book) {
+                $q->whereIn('id', $book->authors()->pluck('id')->toArray());
+            })
+            ->with('categories')
+            ->get();
+
+
+
         $data = [
+            'similars' => $similars,
             'liked' => $liked,
             'book' => $book,
         ];

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Reader\AlgoliaSearchController;
 use App\Http\Controllers\Reader\Auth\LoginController;
 use App\Http\Controllers\Reader\Auth\RegisterController;
 use App\Http\Controllers\Reader\Auth\VerificationController;
@@ -7,6 +8,7 @@ use App\Http\Controllers\Reader\BookController;
 use App\Http\Controllers\Reader\DashboardController;
 use App\Http\Controllers\Reader\HomeController;
 use App\Http\Controllers\Reader\ShelfController;
+use App\Models\Book;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -48,4 +50,8 @@ Route::controller(BookController::class)
 
 Route::get('shelves/{id}/products', [ShelfController::class, 'shelfBooks'])->name('shelves.books');
 Route::resource('shelves', ShelfController::class);
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware('auth:reader');
+
+
+
+Route::get('search', [AlgoliaSearchController::class, 'search']);
