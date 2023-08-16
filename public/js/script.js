@@ -6,6 +6,23 @@ $(document).ready(function () {
         }
     });
 
+    $('[data-bs-toggle="tooltip"]').tooltip({
+        html: true
+    });
+
+    // let html = '<a href="http://127.0.0.1:8000/dashboard" class="btn btn-sm btn-light">Go to Cart</a>';
+    // $('[content="addBookTooltip"]').on('mouseenter', function () {
+    //     let addToCartHtml = '<a href="http://127.0.0.1:8000/cart?id='+$(this).attr('id')+'&option=r" class="btn btn-sm btn-light">Add to Cart</a>';
+    //     $(this).tooltip({
+    //         html: true,
+    //     });
+    // })
+    //
+    // $('[data-bs-toggle="tooltip"][content="bookTooltip"]').tooltip({
+    //     html: true
+    // });
+
+
     $('table.dataTable').each(function () {
         initDatatables('#' + $(this).attr('id'), $(this).attr('searchable'));
     })
@@ -159,20 +176,30 @@ function like() {
     likeButton.on('click', function () {
         let a = $(this);
         let id = a.attr('id');
+        let span = $(this).find('span');
         let totalLikes = $('span#book' + id);
+
+        span.html('<img src="http://127.0.0.1:8000/img/loading.gif" width="16" height="16">')
+
         $.ajax({
             method: 'GET',
             url: '/book/' + id + '/like',
             success: function (response) {
-                if (response === 'liked') {
-                    a.removeClass('text-dark');
-                    a.addClass('text-danger');
-                    totalLikes.text(parseInt(totalLikes.text()) + 1);
-                } else if (response === 'disliked') {
-                    a.removeClass('text-danger');
-                    a.addClass('text-dark');
-                    totalLikes.text(parseInt(totalLikes.text()) - 1);
-                }
+                setTimeout(function () {
+                    if (response === 'liked') {
+                        span.removeClass('text-dark');
+                        span.addClass('text-danger');
+                        span.html('<i class="bi-hand-thumbs-up-fill"></i>')
+                        totalLikes.text(parseInt(totalLikes.text()) + 1);
+
+                    } else if (response === 'disliked') {
+                        span.removeClass('text-danger');
+                        span.addClass('text-dark');
+                        span.html('<i class="bi-hand-thumbs-up-fill"></i>')
+                        totalLikes.text(parseInt(totalLikes.text()) - 1);
+
+                    }
+                }, 100);
 
                 // Live toast
                 const toastBootstrap = bootstrap.Toast.getOrCreateInstance($('#liveToast'))
@@ -189,6 +216,58 @@ function like() {
     });
 }
 like();
+
+
+function addToCart() {
+    let addToCartButton = $('a[content=cart]');
+
+    if (window.location.href !== '/') {
+        addToCartButton.on('click', function () {
+            let a = $(this);
+            let id = a.attr('id');
+            let option = a.attr('option');
+            let remove = a.attr('remove');
+            let span = $(this).find('span');
+
+            span.html('<img src="http://127.0.0.1:8000/img/loading.gif" width="16" height="16">')
+
+            $.ajax({
+                method: 'GET',
+                data: {
+                    'id': id,
+                    'option': option,
+                    'remove': remove,
+                },
+                url: '/cart',
+                success: function (response) {
+                    setTimeout(function () {
+                        if (response === 'added') {
+                            span.removeClass('text-dark');
+                            span.addClass('text-success');
+                            span.html('<i class="bi-cart-check-fill"></i>')
+                        } else if (response === 'removed') {
+                            span.removeClass('text-success');
+                            span.addClass('text-dark');
+                            span.html('<i class="bi-cart-plus-fill"></i>')
+                        }
+                    }, 100);
+
+                    // Live toast
+                    const toastBootstrap = bootstrap.Toast.getOrCreateInstance($('#liveToast'))
+                    $('#liveToast .toast-body').addClass('toast-body bg-success-subtle text-success-emphasis rounded');
+                    $('#liveToast .toast-body span#content').text(response);
+                    toastBootstrap.show()
+                    // Live toast
+
+                },
+                error: function (jqXHR, textStatus, response) {
+                    /* some function */
+                }
+            });
+        });
+    }
+}
+addToCart();
 
 function hideAlertToast() {
     if ($(document).has('#toast')) {
@@ -266,3 +345,9 @@ function initDatatables(selector, searchable = false) {
 $('td a[content=like]').on('click', function () {
     $(this).closest('tr').fadeOut();
 })
+
+
+// $('a.atc').on('click', function () {
+//     let content = $(this).attr('content');
+//     alert(content['id'])
+// })

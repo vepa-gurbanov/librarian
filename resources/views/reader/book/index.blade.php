@@ -9,7 +9,7 @@
                 @include('reader.app.filter')
             </div>
             <div class="col">
-                <div class="row row-cols-3 row-cols-md-4 row-cols-xl-5 g-4 mb-4">
+                <div class="row row-cols-sm-1 row-cols-2 row-cols-md-3 row-cols-xl-4 g-4 mb-4">
                     @foreach($books as $book)
                         <div class="col">
                             @include('reader.app.book')

@@ -36,21 +36,22 @@ Route::get('locale/{locale}', [HomeController::class, 'language'])->name('langua
 
 Route::controller(BookController::class)
     ->group(function () {
-        Route::get('/books', 'index')->name('books.index');
-        Route::get('/book/create', 'create')->name('books.create')->middleware('auth:reader');
-        Route::post('/book/store', 'store')->middleware('auth:reader');
-        Route::get('/book/{slug}', 'show')->name('books.show');
-        Route::get('/book/{slug}/edit', 'edit')->name('books.edit')->middleware('auth:reader');
-        Route::patch('/book/{slug}/update', 'update')->middleware('auth:reader');
-        Route::delete('/book/{slug}/delete', 'delete')->name('books.delete')->middleware('auth:reader');
-        Route::get('/books/{id}/{rating}', 'rate')->name('books.rate')->middleware('auth:reader');
-        Route::post('/book/{slug}/review_note', 'reviewAndNote')->name('book.review.note')->middleware('auth:reader');
-        Route::get('/book/{id}/like', 'like')->name('book.like');
+        Route::get('books', 'index')->name('books.index');
+        Route::get('book/create', 'create')->name('books.create')->middleware('auth:reader');
+        Route::post('book/store', 'store')->middleware('auth:reader');
+        Route::get('book/{slug}', 'show')->name('books.show');
+        Route::get('book/{slug}/edit', 'edit')->name('books.edit')->middleware('auth:reader');
+        Route::patch('book/{slug}/update', 'update')->middleware('auth:reader');
+        Route::delete('book/{slug}/delete', 'delete')->name('books.delete')->middleware('auth:reader');
+        Route::get('books/{id}/{rating}', 'rate')->name('books.rate')->middleware('auth:reader');
+        Route::post('book/{slug}/review_note', 'reviewAndNote')->name('book.review.note')->middleware('auth:reader');
+        Route::get('book/{id}/like', 'like')->name('book.like');
     });
 
 Route::get('shelves/{id}/products', [ShelfController::class, 'shelfBooks'])->name('shelves.books');
 Route::resource('shelves', ShelfController::class);
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware('auth:reader');
+Route::get('cart', [DashboardController::class, 'cart'])->name('cart');
 
 
 

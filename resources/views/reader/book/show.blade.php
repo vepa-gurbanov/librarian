@@ -78,9 +78,18 @@
                         </div>
                     </div>
                     <div class="mb-3">
-                        <a href="#" class="btn btn-sm btn-primary w-100">
-                            @lang('lang.rent-per-day'): {!! $book->priceFormat($book->price) !!}
-                        </a>
+
+                        @if(in_array('r', $inCart) or in_array('b', $inCart))
+                            <a href="{{ route('dashboard') }}" class="btn btn-sm btn-primary w-100" data-bs-toggle="tooltip"
+                               data-bs-placement="top" data-bs-custom-class="custom-tooltip" title="<i class='bi-cart-check'></i> Go to Cart">
+                                @lang('lang.rent-per-day'): {{ $book->price() }} <span class="small-sm font-monospace">TMT</span>
+                            </a>
+                        @else
+                            <a href="{{ route('cart', ['id' => $book->id, 'option' => 'r']) }}" class="btn btn-sm btn-primary w-100" data-bs-toggle="tooltip"
+                               data-bs-placement="top" data-bs-custom-class="custom-tooltip" title="<i class='bi-cart-check'></i> Add to Cart">
+                                @lang('lang.rent-per-day'): {{ $book->price() }} <span class="small-sm font-monospace">TMT</span>
+                            </a>
+                        @endif
                     </div>
                 </div>
                 <div class="col p-4">
@@ -159,16 +168,40 @@
                                         <div class="small"><span>@lang('lang.format'): </span>{{ $option->format }}</div>
                                         <div class="small"><span>@lang('lang.volume'): </span>{{ $option->volume }} mb</div>
                                         <div class="small"><span>@lang('lang.price'): </span>{{ number_format($option->price, '2') }} <span class="small-sm">TMT</span></div>
-                                        <a href="#" class="btn btn-sm btn-primary">@lang('lang.download') {{ $option->type === 'electron' ? 'PDF' : strtoupper($option->type) }}</a>
+
+                                        @if(in_array(array_search($option->type, config('settings.purchase')), $inCart))
+                                            <a href="{{ route('dashboard') }}" class="btn btn-sm btn-primary" data-bs-toggle="tooltip"
+                                               data-bs-placement="top" data-bs-custom-class="custom-tooltip" title="<i class='bi-cart-check'></i> Go to Cart">
+                                                @lang('lang.download') {{ $option->type === 'electron' ? 'PDF' : strtoupper($option->type) }}
+                                            </a>
+                                        @else
+                                            <a href="{{ route('cart', ['id' => $book->id, 'option' => array_search($option->type, config('settings.purchase'))]) }}" class="btn btn-sm btn-primary" data-bs-toggle="tooltip"
+                                               data-bs-placement="top" data-bs-custom-class="custom-tooltip" title="<i class='bi-cart-plus'></i> Add to Cart">
+                                                @lang('lang.download') {{ $option->type === 'electron' ? 'PDF' : strtoupper($option->type) }}
+                                            </a>
+                                        @endif
+
                                     </div>
                                 @endforeach
                             </div>
                             <div class="mb-3">
-                                <a href="#" class="btn btn-outline-primary m-1">
-                                    <span class="bi-gift-fill text-danger"></span>
-                                    <span class="text-danger">@lang('lang.bundle'):</span> {{ $book->options->sum('price') + $book->price }}
-                                    <span class="small-sm">TMT</span>
-                                </a>
+
+                                @if(in_array(array_search('b', config('settings.purchase')), $inCart))
+                                    <a href="{{ route('dashboard') }}" class="btn btn-outline-primary m-1" data-bs-toggle="tooltip"
+                                       data-bs-placement="top" data-bs-custom-class="custom-tooltip" title="<i class='bi-cart-check'></i> Go to Cart">
+                                        <span class="bi-gift-fill text-danger"></span>
+                                        <span class="text-danger">@lang('lang.bundle'):</span> {{ $book->options->sum('price') + $book->price() }}
+                                        <span class="small-sm">TMT</span>
+                                    </a>
+                                @else
+                                    <a href="{{ route('cart', ['id' => $book->id, 'option' => 'b']) }}" class="btn btn-outline-primary m-1" data-bs-toggle="tooltip"
+                                       data-bs-placement="top" data-bs-custom-class="custom-tooltip" title="<i class='bi-cart-check'></i> Go to Cart">
+                                        <span class="bi-gift-fill text-danger"></span>
+                                        <span class="text-danger">@lang('lang.bundle'):</span> {{ $book->options->sum('price') + $book->price() }}
+                                        <span class="small-sm">TMT</span>
+                                    </a>
+                                @endif
+
                             </div>
                         </div>
                     @endif
@@ -259,7 +292,7 @@
                     <a href="{{ route('books.index', ['au' => [[$author->id]]]) }}" class="badge bg-primary rounded-pill text-decoration-none trigger">{{ $author->name }}</a>
                 @endforeach
                 @foreach($book->categories as $category)
-                    <a href="{{ route('books.index', ['c' => [[$category->id]]]) }}" class="badge bg-primary rounded-pill text-decoration-none trigger">{{ $author->name }}</a>
+                    <a href="{{ route('books.index', ['c' => [[$category->id]]]) }}" class="badge bg-primary rounded-pill text-decoration-none trigger">{{ $category->name }}</a>
                 @endforeach
                 <hr>
             </div>

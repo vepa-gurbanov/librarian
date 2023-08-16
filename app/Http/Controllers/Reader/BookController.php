@@ -11,6 +11,7 @@ use App\Models\Publisher;
 use App\Models\Review;
 use \Illuminate\Database\Query\Builder;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
 
@@ -123,6 +124,8 @@ class BookController extends Controller
             ->with('values:id,attribute_id,name')
             ->get(['id', 'name']);
 
+        $cart = collect(Cookie::has('cart') ? json_decode(Cookie::get('cart'), true) : []);
+
         $data = [
             'q' => $q,
             'f_min_price' => $f_min_price,
@@ -140,6 +143,7 @@ class BookController extends Controller
             'orderConfig' => $orderConfig,
 
             'books' => $books,
+            'addedToCart' => $cart->where('id', 180)->where('option', 'r')->count() > 0 ? 'text-success' : 'text-white',
         ];
 
         return view('reader.book.index')
@@ -150,7 +154,8 @@ class BookController extends Controller
         $book = Book::query()->where('slug', $slug)
             ->with('ratedReaders', 'attributeValues.attribute', 'options', 'reviews.reader', 'notes.reader', 'categories:id,name,slug', 'authors')->first();
 
-        $liked = in_array($book->id, $this->getCookie('likedBooks')) ? 'text-danger' : 'text-dark';
+        $cart = collect(Cookie::has('cart') ? json_decode(Cookie::get('cart'), true) : []);
+
         $this->setCookie('viewedBooks', $book->id, ['success' => 'Added to viewed list', 'error' => 'Already in the viewed list'], 'viewed');
 
         $similars = Book::query()
@@ -163,11 +168,13 @@ class BookController extends Controller
             ->with('categories')
             ->get();
 
-
+        $cart = collect(Cookie::has('cart') ? json_decode(Cookie::get('cart'), true) : []);
+        $inCart = $cart->where('id', $book->id)->pluck('option')->toArray();
 
         $data = [
             'similars' => $similars,
-            'liked' => $liked,
+            'liked' => in_array($book->id, $this->getCookie('likedBooks')) ? 'text-danger' : 'text-dark',
+            'inCart' => $inCart,
             'book' => $book,
         ];
 
@@ -248,7 +255,7 @@ class BookController extends Controller
     }
 
 
-    public function like($id): JsonResponse
+    public function like($id): JsonResponse|RedirectResponse
     {
         $cookieName = 'likedBooks';
         try {
@@ -257,9 +264,13 @@ class BookController extends Controller
                 'success' => 'liked',
             ]);
 
-            return response()->json($message, 200);
+            return request()->routeIs('book.like', $id)
+                ? redirect()->back()->with('success', $message)
+                : response()->json($message, 200);
         } catch (\Exception $e) {
-            return response()->json(['error', $e->getMessage()], 400);
+            return request()->routeIs('book.like', $id)
+                ? redirect()->back()->with(['error', $e->getMessage()])
+                : response()->json(['error', $e->getMessage()], 400);
         }
     }
 }

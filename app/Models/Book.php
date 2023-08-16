@@ -240,6 +240,14 @@ class Book extends Model
     }
 
 
+     public function price(): float
+    {
+        return $this->discount_percent
+            ? $this->discountPrice()
+            : $this->price;
+    }
+
+
     public function priceFormat($type, $class = ''): string
     {
         $price = $type === 'price' ? $this->price : $this->value;

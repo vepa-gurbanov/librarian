@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Author;
 use App\Models\Book;
 use App\Models\Category;
+use App\Models\Option;
 use App\Models\Shelf;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Database\Query\Builder;
@@ -47,6 +48,15 @@ class HomeController extends Controller
                 ],
             ],
         ];
+
+        $cart = collect(json_decode(Cookie::get('cart'), true));
+
+//return asset('img/loading.gif');
+//return collect(json_decode(Cookie::get('cart'), true))->where('option', 'r')->pluck('id');
+//        return $cart->where('id', 180)->where('option', 'r')->pluck('id');
+
+//        return $cart->groupBy('id');
+
 
         return view('reader.home.index')->with($data);
     }
