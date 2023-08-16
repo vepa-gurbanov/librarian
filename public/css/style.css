@@ -1,6 +1,9 @@
 .border-end, .border-bottom, .border-top, .border-start, .border {
     --bs-border-color: #86b7fe !important;
 }
+.rotate-180 {
+    rotate: 180deg;
+}
 .bordered{
     border-color:#86b7fe;
     outline:0;

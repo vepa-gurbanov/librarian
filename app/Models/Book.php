@@ -282,5 +282,4 @@ class Book extends Model
 
         return $array;
     }
-
 }

@@ -10,18 +10,6 @@ $(document).ready(function () {
         html: true
     });
 
-    // let html = '<a href="http://127.0.0.1:8000/dashboard" class="btn btn-sm btn-light">Go to Cart</a>';
-    // $('[content="addBookTooltip"]').on('mouseenter', function () {
-    //     let addToCartHtml = '<a href="http://127.0.0.1:8000/cart?id='+$(this).attr('id')+'&option=r" class="btn btn-sm btn-light">Add to Cart</a>';
-    //     $(this).tooltip({
-    //         html: true,
-    //     });
-    // })
-    //
-    // $('[data-bs-toggle="tooltip"][content="bookTooltip"]').tooltip({
-    //     html: true
-    // });
-
 
     $('table.dataTable').each(function () {
         initDatatables('#' + $(this).attr('id'), $(this).attr('searchable'));
@@ -151,20 +139,17 @@ rate()
 
 function collapse() {
     let collapse = $('a[data-bs-toggle="collapse"]');
-    let text = collapse.text();
+    // collapse.text(collapse.text() + '(Show)');
     collapse.on('click', function () {
-        if (collapse.attr('aria-expanded') === 'false') {
-            if (text !== 'Show more') {
-                collapse.text(text + ' (Show)');
-            } else {
-                collapse.text('Show more');
-            }
-        } else if (collapse.attr('aria-expanded') === 'true') {
-            if (text !== 'Show less') {
-                collapse.text(text + ' (Hide)');
-            } else {
-                collapse.text('Show less');
-            }
+        // let text = $(this).text();
+        let caret = $(this).find('span#caret');
+        caret.addClass('bi-caret-down-fill');
+        if ($(this).attr('aria-expanded') === 'false') {
+            caret.addClass('bi-caret-down-fill');
+            caret.removeClass('bi-caret-up-fill');
+        } else if ($(this).attr('aria-expanded') === 'true') {
+            caret.addClass('bi-caret-up-fill');
+            caret.removeClass('bi-caret-down-fill');
         }
     })
 }
@@ -342,12 +327,15 @@ function initDatatables(selector, searchable = false) {
 }
 
 
-$('td a[content=like]').on('click', function () {
+$('td a[content=dislike]').on('click', function () {
     $(this).closest('tr').fadeOut();
+    $.ajax({
+        method: 'GET',
+        data: {
+            'id': $(this).attr('id'),
+            'option': $(this).attr('option'),
+            'remove': true,
+        },
+        url: '/cart',
+    });
 })
-
-
-// $('a.atc').on('click', function () {
-//     let content = $(this).attr('content');
-//     alert(content['id'])
-// })

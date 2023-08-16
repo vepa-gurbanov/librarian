@@ -22,6 +22,26 @@ class DashboardController extends Controller
     public function index()
     {
         $reader = auth('reader')->user();
+        $cart = collect($this->getCookie());
+//return $cart;
+        $inCartBooks = [];
+        foreach ($cart as $item) {
+            $inCartBooks[] = Book::query()->where('id', $item['id'])
+                ->when($item['option'] === 'b', function ($q) {
+                    $q->with('options');
+                })->when($item['option'] === 'a', function ($q) {
+                    $q->with('options', function ($q) {
+                        $q->where('type', 'audiobook');
+                    });
+                })->when($item['option'] === 'e', function ($q) {
+                    $q->with('options', function ($q) {
+                        $q->where('type', 'electron');
+                    });
+                })
+                ->with('reader')
+                ->get(['id', 'reader_id', 'full_name', 'slug', 'book_code', 'image', 'page', 'price', 'value', 'condition'])
+                ->add(['option' => $item['option'], 'price' => $item['price']]);
+        }
 
         $registeredBooks = Book::query()
             ->whereHas('registrations', function (Builder $q) use ($reader) {
@@ -34,13 +54,8 @@ class DashboardController extends Controller
             ->whereIn('id', json_decode(Cookie::get('likedBooks'), true))
             ->get();
 
-//        $cartBooks = Book::query()->whereIn('id', )
-//        $book = Book::query()->where('id', $request->id)
-//            ->with(['options', 'reader'])
-//            ->first(['id', 'slug', 'name', 'book_code', 'image', 'price', 'value', 'condition', 'discount_*']);
-
-
         $data = [
+            'inCartBooks' => $inCartBooks,
             'registeredBooks' => $registeredBooks,
             'likedBooks' => $likedBooks,
         ];
@@ -89,11 +104,11 @@ class DashboardController extends Controller
         try {
             $res = $this->setCookie($request->id, $request->option, $price, remove: $request->has('remove'));
 
-            return $request->routeIs('cart')
+            return $request->is('/cart')
                 ? redirect()->back()->with('success', $res)
                 : response()->json($res);
         } catch (\Exception $e) {
-            return $request->routeIs('cart')
+            return $request->is('/cart')
                 ? redirect()->back()->with('error', $res)
                 : response()->json(['error' => trans('lang.failed')], 404);
         }

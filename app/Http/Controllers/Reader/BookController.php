@@ -264,11 +264,11 @@ class BookController extends Controller
                 'success' => 'liked',
             ]);
 
-            return request()->routeIs('book.like', $id)
+            return request()->is('/book/' . $id . 'like')
                 ? redirect()->back()->with('success', $message)
                 : response()->json($message, 200);
         } catch (\Exception $e) {
-            return request()->routeIs('book.like', $id)
+            return request()->is('/book/' . $id . 'like')
                 ? redirect()->back()->with(['error', $e->getMessage()])
                 : response()->json(['error', $e->getMessage()], 400);
         }
