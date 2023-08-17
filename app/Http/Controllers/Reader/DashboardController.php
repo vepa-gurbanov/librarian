@@ -12,6 +12,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class DashboardController extends Controller
 {
@@ -37,7 +38,6 @@ class DashboardController extends Controller
                 ->get(['id', 'reader_id', 'full_name', 'slug', 'book_code', 'image', 'page', 'price', 'value', 'condition', 'created_at'])
                 ->add(['option' => $item['option'], 'price' => $item['price']]);
         }
-
         $registeredBooks = collect([]);
         if (auth('reader')->check()) {
             $registeredBooks = Book::query()
@@ -64,19 +64,18 @@ class DashboardController extends Controller
 
     public function cart(Request $request): JsonResponse|RedirectResponse
     {
-        $v = Validator::make($request->all(), [
-            'id' => ['required', 'integer', 'min:1'],
-            'option' => ['required', 'string', 'in:' . implode(',', array_keys(config('settings.purchase')))],
-        ], [
-            'id.required' => 'id field is required',
-            'id.integer' => 'id field must be integer',
-            'id.min' => 'id field must be minimum value 1',
-            'option.required' => 'option field is required',
-            'option.string' => 'option field  must be string',
-            'option.in' => 'option field  must be in ' . implode(',', array_keys(config('settings.purchase'))),
-        ]);
+        try {
+            $request->validate([
+                'id' => ['required', 'integer', 'min:1'],
+                'option' => ['required', 'string', 'in:' . implode(',', array_keys(config('settings.purchase')))],
+            ]);
+        } catch (\Exception $e) {
+            return $request->is('/cart')
+                ? redirect()->back()->with('error', $e->getMessage())
+                : response()->json(['status' => 'error', 'message' => $e->getMessage()], 400);
+        }
 
-        if ($v->fails() or count($request->query()) <= 0) {
+        if (count($request->query()) <= 0) {
             abort(404);
         }
 
@@ -103,12 +102,12 @@ class DashboardController extends Controller
             $res = $this->setCookie($request->id, $request->option, $price, remove: $request->has('remove'));
 
             return $request->is('/cart')
-                ? redirect()->back()->with('success', $res)
-                : response()->json($res);
+                ? redirect()->back()->with('success', trans('lang.' . $res))
+                : response()->json(['status' => 'success', 'key' => $res, 'message' => trans('lang.' . $res)], 200);
         } catch (\Exception $e) {
             return $request->is('/cart')
-                ? redirect()->back()->with('error', $res)
-                : response()->json(['error' => trans('lang.failed')], 404);
+                ? redirect()->back()->with('error', $e->getMessage())
+                : response()->json(['status' => 'error', 'message' => $e->getMessage()], 400);
         }
     }
 
@@ -149,12 +148,34 @@ class DashboardController extends Controller
 
 
     public function dateControl(Request $request) {
-        $receiveDate = Carbon::parse($request['receive_date_input']);
-        $totalDaysInput = $request['total_date_input'];
+        try {
+            $request->validate([
+                'receive_date_input' => ['required', 'date', 'after_or_equal:today'],
+                'return_date_input' => ['sometimes', 'required', 'date', 'after:receive_date_input'],
+                'total_date_input' => ['sometimes', 'required', 'integer', 'min:1', 'max:100'],
+                'price_per_day' => ['sometimes', 'required', 'numeric', 'min:0'],
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 400);
+        }
 
-        return response()->json([
-            'status' => 'success',
-            'receive_date' => $receiveDate->format('Y-m-d H:i:s'),
-        ], 200);
+        $receiveDate = Carbon::parse($request['receive_date_input']);
+        if ($request->has('return_date_input')) {
+            $returnDate = Carbon::parse($request['return_date_input']);
+
+            return response()->json([
+                'status' => 'success',
+                'total_days' => $receiveDate->diffInDays($returnDate),
+                'price_per_day' => number_format(intval($request->price_per_day) * $receiveDate->diffInDays($returnDate), 2),
+            ], 200);
+        } else {
+            $totalDaysInput = intval($request['total_date_input']);
+
+            return response()->json([
+                'status' => 'success',
+                'return_date' => $receiveDate->addDays($totalDaysInput)->toDateString(),
+                'price_per_day' => number_format(intval($request->price_per_day) * $totalDaysInput, 2),
+            ], 200);
+        }
     }
 }

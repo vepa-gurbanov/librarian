@@ -15,13 +15,13 @@ $(document).ready(function () {
         initDatatables('#' + $(this).attr('id'), $(this).attr('searchable'));
     })
 
+    (() => {
+        'use strict'
+        $('#navbarSideCollapse').on('click', () => {
+            $('.offcanvas-collapse').classList.toggle('open')
+        })
+    })()
 });
-(() => {
-    'use strict'
-    $('#navbarSideCollapse').on('click', () => {
-        $('.offcanvas-collapse').classList.toggle('open')
-    })
-})()
 
 
 function swiperSlider() {
@@ -41,9 +41,7 @@ function swiperSlider() {
             prevEl: ".swiper-button-prev",
         },
     });
-}
-
-swiperSlider();
+} swiperSlider();
 
 function swiperMain() {
     $('.swiperContent').each(function () {
@@ -68,9 +66,7 @@ function swiperMain() {
             autoplay: true,
         });
     });
-}
-
-swiperMain();
+} swiperMain();
 
 function swiperAuthors() {
     new Swiper('.swiperAuthors', {
@@ -83,35 +79,7 @@ function swiperAuthors() {
         },
         autoplay: true,
     })
-}
-swiperAuthors();
-
-
-$('button#searchbar').on('click', function () {
-    let q = $('input#searchbar').val();
-    let form = $('form#bookFilter');
-    let input = '<input type="hidden" name="q" value="' + q + '">';
-    form.append(input);
-    form.submit();
-});
-
-// function bookRating() {
-//     $("#rating").rating({
-//         min: 0,
-//         max: 5,
-//         step: 0.1,
-//         stars: 5,
-//         // showCaption:false,
-//         starCaptions: function (val) {
-//             if (val < 3) {
-//                 return "Low: " + val + " stars";
-//             } else {
-//                 return "High: " + val + " stars";
-//             }
-//         }
-//     });
-// }
-// bookRating();
+} swiperAuthors();
 
 function rate() {
     $('input:radio[name=rate]').on('click', function () {
@@ -152,62 +120,50 @@ function collapse() {
             caret.removeClass('bi-caret-down-fill');
         }
     })
-}
-collapse();
+} collapse();
 
 
 function like() {
-    let likeButton = $('a[content=like]');
-    likeButton.on('click', function () {
+    $('a[content=like]').on('click', function () {
         let a = $(this);
         let id = a.attr('id');
         let span = $(this).find('span');
         let totalLikes = $('span#book' + id);
 
-        span.html('<img src="http://127.0.0.1:8000/img/loading.gif" width="16" height="16">')
+        span.html('<img src="http://127.0.0.1:8000/img/loading.gif" width="16" height="16">');
 
         $.ajax({
-            method: 'GET',
             url: '/book/' + id + '/like',
-            success: function (response) {
+            method: 'GET',
+            processData: false,
+            contentType: false,
+            dataType: 'json',
+            success: function (response, textStatus, jqXHR) {
+                $.each(response, function (key, value) {
+                    console.log(key + ': ' + value)
+                })
                 setTimeout(function () {
-                    if (response === 'liked') {
-                        span.removeClass('text-dark');
-                        span.addClass('text-danger');
-                        span.html('<i class="bi-hand-thumbs-up-fill"></i>')
+                    if (response['key'] === 'liked') {
+                        span.removeClass('text-dark').addClass('text-danger').html('<i class="bi-hand-thumbs-up-fill"></i>');
                         totalLikes.text(parseInt(totalLikes.text()) + 1);
-
-                    } else if (response === 'disliked') {
-                        span.removeClass('text-danger');
-                        span.addClass('text-dark');
-                        span.html('<i class="bi-hand-thumbs-up-fill"></i>')
+                    } else if (response['key'] === 'disliked') {
+                        span.removeClass('text-danger').addClass('text-dark').html('<i class="bi-hand-thumbs-up-fill"></i>');
                         totalLikes.text(parseInt(totalLikes.text()) - 1);
-
                     }
                 }, 100);
-
-                // Live toast
-                const toastBootstrap = bootstrap.Toast.getOrCreateInstance($('#liveToast'))
-                $('#liveToast .toast-body').addClass('toast-body bg-success-subtle text-success-emphasis rounded');
-                $('#liveToast .toast-body span#content').text(response);
-                toastBootstrap.show()
-                // Live toast
-
+                liveToast(response['message'], 'bi-check-circle-fill', 'success')
             },
-            error: function (jqXHR, textStatus, response) {
-                /* some function */
+            error: function(jqXHR, textStatus, errorThrown){
+                liveToast(jqXHR['responseJSON']['message'], 'bi-exclamation-triangle-fill', 'danger')
             }
         });
     });
-}
-like();
+} like();
 
 
 function addToCart() {
-    let addToCartButton = $('a[content=cart]');
-
     if (window.location.href !== '/') {
-        addToCartButton.on('click', function () {
+        $('a[content=cart]').on('click', function () {
             let a = $(this);
             let id = a.attr('id');
             let option = a.attr('option');
@@ -217,13 +173,16 @@ function addToCart() {
             span.html('<img src="http://127.0.0.1:8000/img/loading.gif" width="16" height="16">')
 
             $.ajax({
+                url: '/cart',
                 method: 'GET',
                 data: {
                     'id': id,
                     'option': option,
                     'remove': remove,
                 },
-                url: '/cart',
+                processData: false,
+                contentType: false,
+                dataType: 'json',
                 success: function (response) {
                     setTimeout(function () {
                         if (response === 'added') {
@@ -260,36 +219,36 @@ function hideAlertToast() {
             $('#toast').fadeOut();
         }, 3000)
     }
-}
-hideAlertToast();
+} hideAlertToast();
 
-/* Starts live search */
-$('.scrollbar').each(function () {
-    var search = 'search_' + $(this).attr('content');
-    var scroll = $(this).attr('content') + 'Scroll';
+function liveSearch() {
+    /* Starts live search */
+    $('.scrollbar').each(function () {
+        var search = 'search_' + $(this).attr('content');
+        var scroll = $(this).attr('content') + 'Scroll';
 
-    $('#' + search).keyup(function () {
+        $('#' + search).keyup(function () {
 
-        // Retrieve the input field text and reset the count to zero
-        var filter = $(this).val();
-        // Loop through the comment list
-        $("div.scrollbar#" + scroll + " div#filterContent").each(function () {
+            // Retrieve the input field text and reset the count to zero
+            var filter = $(this).val();
+            // Loop through the comment list
+            $("div.scrollbar#" + scroll + " div#filterContent").each(function () {
 
 
-            // If the list item does not contain the text phrase fade it out
-            if ($(this).text().search(new RegExp(filter, "i")) < 0) {
-                $(this).fadeOut();
+                // If the list item does not contain the text phrase fade it out
+                if ($(this).text().search(new RegExp(filter, "i")) < 0) {
+                    $(this).fadeOut();
 
-                // Show the list item if the phrase matches and increase the count by 1
-            } else {
-                $(this).show();
-            }
+                    // Show the list item if the phrase matches and increase the count by 1
+                } else {
+                    $(this).show();
+                }
+            });
+
         });
-
     });
-});
-/* End live search */
-
+    /* End live search */
+} liveSearch()
 
 function initDatatables(selector, searchable = false) {
     if (searchable) {
@@ -326,76 +285,141 @@ function initDatatables(selector, searchable = false) {
     }
 }
 
-
-$('td a[content=dislike]').on('click', function () {
-    $(this).closest('tr').fadeOut();
-    $.ajax({
-        method: 'GET',
-        data: {
-            'id': $(this).attr('id'),
-            'option': $(this).attr('option'),
-            'remove': true,
-        },
-        url: '/cart',
+function removeFromCart() {
+    $('td a[content=removeFromCart]').on('click', function () {
+        $(this).closest('tr').fadeOut();
+        $.ajax({
+            method: 'GET',
+            data: {
+                'id': $(this).attr('id'),
+                'option': $(this).attr('option'),
+                'remove': true,
+            },
+            url: '/cart',
+        });
     });
-})
+} removeFromCart()
 
+function date() {
+    $.each(['receive', 'return'], function (k, v) {
+        $('input[name=' + v + '_date_input]').on('change', function () {
+            let a = $(this);
 
+            $.ajax({
+                url: '/date',
+                method: 'GET',
+                processData: true,
+                contentType: false,
+                dataType: 'json',
+                data: {
+                    'receive_date_input': $('input#' + a.attr('id') + '[name=receive_date_input]').val(),
+                    'return_date_input': $('input#' + a.attr('id') + '[name=return_date_input]').val(),
+                    'price_per_day': $('span#price_per_day_' + a.attr('id')).text(),
+                },
+                success: function (response, textStatus, jqXHR) {
+                    $('input#' + a.attr('id') + '[name=total_date_input]').val(response['total_days']);
+                    $('span#total_price_' + a.attr('id')).text(response['price_per_day']);
+                },
+                error: function(jqXHR, textStatus, errorThrown){
+                    liveToast(jqXHR['responseJSON']['message'], 'bi-exclamation-triangle-fill', 'danger');
+                },
+                complete : function(){
+                    // $.unblockUI();
+                }
+            });
+        });
+    })
 
-$('input[name=total_date_input]').on('change', function () {
-    let totalRentDaysCount = parseInt($(this).val());
+    $('input[name=total_date_input]').on('change', function () {
+        let a = $(this);
+        $.ajax({
+            url: '/date',
+            method: 'GET',
+            processData: true,
+            contentType: false,
+            dataType: 'json',
+            data: {
+                'total_date_input': a.val(),
+                'receive_date_input': $('input#'+a.attr('id')+'[name=receive_date_input]').val(),
+                'price_per_day': $('span#price_per_day_' + a.attr('id')).text(),
+            },
+            success: function (response, textStatus, jqXHR) {
+                $('input#' + a.attr('id') + '[name=return_date_input]').val(response['return_date'])
+                $('span#total_price_' + a.attr('id')).text(response['price_per_day']);
+            },
+            error: function(jqXHR, textStatus, errorThrown){
+                liveToast(jqXHR['responseJSON']['message'], 'bi-exclamation-triangle-fill', 'danger')
+            },
+            complete : function(){
+                // $.unblockUI();
+            }
+        });
+    });
+} date()
 
-    let receiveDateInput = $('input#'+$(this).attr('id')+'[name=receive_date_input]');
-    let returnDateInput = $('input#'+$(this).attr('id')+'[name=return_date_input]');
-
-    let receiveDate = new Date(receiveDateInput.val());
-    // let returnDate = new Date(returnDateInput.val());
-
-    let currentYear = receiveDate.getFullYear();
-    let currentMonth = receiveDate.getMonth();
-    let currentDate = receiveDate.getDate();
-
-    // let firstDayOfCurrentMonth = new Date(currentYear, currentMonth, 1).getDate();
-    let lastDayOfCurrentMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-    let returnDateUpdated = currentDate + totalRentDaysCount;
-
-
-    if (lastDayOfCurrentMonth < returnDateUpdated) {
-        let date = new Date();
-
-        let currentYear = date.getFullYear();
-        let currentMonth = date.getMonth();
-        let currentDate = date.getDate();
-    }
-
-
-
-    if (lastDayOfCurrentMonth >= returnDateUpdated) {
-        if (currentMonth <= 9) {
-            currentMonth = '0' + currentMonth;
-        }
-        let returnDate = new Date(currentYear + '-' + currentMonth + '-' + returnDateUpdated);
-        returnDateInput.val(returnDate.getFullYear() + '-' + returnDate.getMonth() + '-' + returnDate.getDate());
-        console.log('returnDate: ' + returnDate)
-    } else {
-        let returnDate = new Date(currentYear + '-' + (currentMonth+1) + '-' + (returnDateUpdated - lastDayOfCurrentMonth));
-        if (currentMonth <= 8) {
-            currentMonth = '0' + currentMonth;
-        }
-        returnDateInput.val(returnDate.getFullYear() + '-' + currentMonth + '-' + returnDate.getDate() - lastDayOfCurrentMonth);
-        console.log('returnDate: ' + returnDate)
-    }
-
-
-    // let formatted = receive_date.getFullYear()+'-'+receive_date.getMonth()+'-'+(receive_date.getDate()+parseInt(num));
-    // let date = date.setDate(return_date.getDate()+parseInt(num));
-})
-
-
-function GFG_Fun() {
-    let date = new Date();
-    let firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
-    let lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-    console.log("First day=" + firstDay)
-    console.log("Last day = " + lastDay);
+function liveToast(response, icon, textStatus) {
+    const toastBootstrap = bootstrap.Toast.getOrCreateInstance($('#liveToast'))
+    let toastBody = $('#liveToast .toast-body');
+    toastBody.addClass(`toast-body bg-${textStatus}-subtle text-${textStatus}-emphasis rounded`);
+    toastBody.find('span#icon').addClass(icon);
+    toastBody.find('span#content').text(response);
+    toastBootstrap.show()
 }
+
+// $('input[name=total_date_input]').on('change', function () {
+//     let totalRentDaysCount = parseInt($(this).val());
+//
+//     let receiveDateInput = $('input#'+$(this).attr('id')+'[name=receive_date_input]');
+//     let returnDateInput = $('input#'+$(this).attr('id')+'[name=return_date_input]');
+//
+//     let receiveDate = new Date(receiveDateInput.val());
+//     // let returnDate = new Date(returnDateInput.val());
+//
+//     let currentYear = receiveDate.getFullYear();
+//     let currentMonth = receiveDate.getMonth();
+//     let currentDate = receiveDate.getDate();
+//
+//     // let firstDayOfCurrentMonth = new Date(currentYear, currentMonth, 1).getDate();
+//     let lastDayOfCurrentMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+//     let returnDateUpdated = currentDate + totalRentDaysCount;
+//
+//
+//     if (lastDayOfCurrentMonth < returnDateUpdated) {
+//         let date = new Date();
+//
+//         let currentYear = date.getFullYear();
+//         let currentMonth = date.getMonth();
+//         let currentDate = date.getDate();
+//     }
+//
+//
+//
+//     if (lastDayOfCurrentMonth >= returnDateUpdated) {
+//         if (currentMonth <= 9) {
+//             currentMonth = '0' + currentMonth;
+//         }
+//         let returnDate = new Date(currentYear + '-' + currentMonth + '-' + returnDateUpdated);
+//         returnDateInput.val(returnDate.getFullYear() + '-' + returnDate.getMonth() + '-' + returnDate.getDate());
+//         console.log('returnDate: ' + returnDate)
+//     } else {
+//         let returnDate = new Date(currentYear + '-' + (currentMonth+1) + '-' + (returnDateUpdated - lastDayOfCurrentMonth));
+//         if (currentMonth <= 8) {
+//             currentMonth = '0' + currentMonth;
+//         }
+//         returnDateInput.val(returnDate.getFullYear() + '-' + currentMonth + '-' + returnDate.getDate() - lastDayOfCurrentMonth);
+//         console.log('returnDate: ' + returnDate)
+//     }
+//
+//
+//     // let formatted = receive_date.getFullYear()+'-'+receive_date.getMonth()+'-'+(receive_date.getDate()+parseInt(num));
+//     // let date = date.setDate(return_date.getDate()+parseInt(num));
+// })
+//
+//
+// function GFG_Fun() {
+//     let date = new Date();
+//     let firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
+//     let lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+//     console.log("First day=" + firstDay)
+//     console.log("Last day = " + lastDay);
+// }

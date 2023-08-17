@@ -219,7 +219,7 @@ class BookController extends Controller
     }
 
 
-    public function setCookie($name, $id, $message, $column = 'liked', $time = 7*24*60): string
+    public function setCookie($name, $id, $column = 'liked', $time = 7*24*60): string
     {
         $cookie = $this->getCookie($name);
         if (in_array($id, $cookie)) {
@@ -228,11 +228,11 @@ class BookController extends Controller
                 unset($cookie[$remove]);
                 Book::query()->findOrFail($id)->decrement($column);
             }
-            $m = $message['error'];
+            $m = 'disliked';
         } else {
             $cookie[] = $id;
             Book::query()->findOrFail($id)->increment($column);
-            $m = $message['success'];
+            $m = 'liked';
         }
 
         Cookie::queue($name, json_encode($cookie), $time);
@@ -257,20 +257,20 @@ class BookController extends Controller
 
     public function like($id): JsonResponse|RedirectResponse
     {
-        $cookieName = 'likedBooks';
         try {
-            $message = $this->setCookie($cookieName, $id, [
-                'error' => 'disliked',
-                'success' => 'liked',
-            ]);
+            $message = $this->setCookie('likedBooks', $id);
 
             return request()->is('/book/' . $id . 'like')
-                ? redirect()->back()->with('success', $message)
-                : response()->json($message, 200);
+                ? redirect()->back()->with('success', trans('lang.' . $message))
+                : response()->json([
+                    'status' => 'success',
+                    'key' => $message,
+                    'message' => trans('lang.' . $message)
+                ], 200);
         } catch (\Exception $e) {
             return request()->is('/book/' . $id . 'like')
                 ? redirect()->back()->with(['error', $e->getMessage()])
-                : response()->json(['error', $e->getMessage()], 400);
+                : response()->json(['status' => 'error', 'message', $e->getMessage()], 400);
         }
     }
 }

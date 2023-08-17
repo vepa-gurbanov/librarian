@@ -53,6 +53,7 @@ Route::get('shelves/{id}/products', [ShelfController::class, 'shelfBooks'])->nam
 Route::resource('shelves', ShelfController::class);
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 Route::get('cart', [DashboardController::class, 'cart'])->name('cart');
+Route::get('date', [DashboardController::class, 'dateControl'])->name('date');
 
 
 
