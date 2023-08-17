@@ -339,3 +339,63 @@ $('td a[content=dislike]').on('click', function () {
         url: '/cart',
     });
 })
+
+
+
+$('input[name=total_date_input]').on('change', function () {
+    let totalRentDaysCount = parseInt($(this).val());
+
+    let receiveDateInput = $('input#'+$(this).attr('id')+'[name=receive_date_input]');
+    let returnDateInput = $('input#'+$(this).attr('id')+'[name=return_date_input]');
+
+    let receiveDate = new Date(receiveDateInput.val());
+    // let returnDate = new Date(returnDateInput.val());
+
+    let currentYear = receiveDate.getFullYear();
+    let currentMonth = receiveDate.getMonth();
+    let currentDate = receiveDate.getDate();
+
+    // let firstDayOfCurrentMonth = new Date(currentYear, currentMonth, 1).getDate();
+    let lastDayOfCurrentMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    let returnDateUpdated = currentDate + totalRentDaysCount;
+
+
+    if (lastDayOfCurrentMonth < returnDateUpdated) {
+        let date = new Date();
+
+        let currentYear = date.getFullYear();
+        let currentMonth = date.getMonth();
+        let currentDate = date.getDate();
+    }
+
+
+
+    if (lastDayOfCurrentMonth >= returnDateUpdated) {
+        if (currentMonth <= 9) {
+            currentMonth = '0' + currentMonth;
+        }
+        let returnDate = new Date(currentYear + '-' + currentMonth + '-' + returnDateUpdated);
+        returnDateInput.val(returnDate.getFullYear() + '-' + returnDate.getMonth() + '-' + returnDate.getDate());
+        console.log('returnDate: ' + returnDate)
+    } else {
+        let returnDate = new Date(currentYear + '-' + (currentMonth+1) + '-' + (returnDateUpdated - lastDayOfCurrentMonth));
+        if (currentMonth <= 8) {
+            currentMonth = '0' + currentMonth;
+        }
+        returnDateInput.val(returnDate.getFullYear() + '-' + currentMonth + '-' + returnDate.getDate() - lastDayOfCurrentMonth);
+        console.log('returnDate: ' + returnDate)
+    }
+
+
+    // let formatted = receive_date.getFullYear()+'-'+receive_date.getMonth()+'-'+(receive_date.getDate()+parseInt(num));
+    // let date = date.setDate(return_date.getDate()+parseInt(num));
+})
+
+
+function GFG_Fun() {
+    let date = new Date();
+    let firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
+    let lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+    console.log("First day=" + firstDay)
+    console.log("Last day = " + lastDay);
+}

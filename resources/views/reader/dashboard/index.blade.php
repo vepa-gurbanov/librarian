@@ -25,7 +25,7 @@
                             <tr>
                                 <th scope="col">#</th>
                                 <th scope="col">@lang('lang.image')</th>
-                                <th scope="col">@lang('lang.owner')</th>
+                                <th scope="col">@lang('lang.days')</th>
                                 <th scope="col">@lang('lang.description')</th>
                                 <th scope="col">@lang('lang.tools')</th>
                             </tr>
@@ -34,8 +34,8 @@
                             <tr>
                                 <th scope="col" width="5%">#</th>
                                 <th scope="col" width="10%">@lang('lang.image')</th>
-                                <th scope="col" width="15%">@lang('lang.owner')</th>
-                                <th scope="col"width="60%">@lang('lang.description')</th>
+                                <th scope="col" width="25%">@lang('lang.days')</th>
+                                <th scope="col"width="50%">@lang('lang.description')</th>
                                 <th scope="col" width="10%">@lang('lang.tools')</th>
                             </tr>
                             </tfoot>
@@ -44,13 +44,39 @@
                                 <tr>
                                     <th scope="row">{{ $loop->iteration }}</th>
                                     <td><img src="{{ $book[0]->image() }}" class="img-fluid border rounded p-2" width="80"></td>
-                                    <td class="small">
-                                        <div>
-                                            <span class="fw-semibold">@lang('lang.owner'):</span>
-                                            {{ $book[0]->reader->name ?? 'Admin' }}
+                                    <td>
+                                        <div class="d-block">
+                                            @if(in_array($book[1]['option'], ['r', 'b']))
+                                                <div class="col mb-2">
+                                                    <div class="input-group">
+                                                        <span id="receive_date" class="input-group-text w-50">Receive Date: </span>
+                                                        <input class="form-control form-control-sm" name="receive_date_input"
+                                                               id="{{ $book[1]['option'] . '_' . $book[0]['id'] }}" type="date" value="{{ now()->toDateString() }}"
+                                                               onfocus="this.min=new Date().toISOString().split('T')[0]; this.max=new Date( new Date().setDate(new Date().getDate() + 2)).toISOString().split('T')[0]">
+                                                    </div>
+                                                </div>
+                                                <div class="col mb-2">
+                                                    <div class="input-group small">
+                                                        <span id="return_date" class="input-group-text w-50">Return Date: </span>
+                                                        <input class="form-control form-control-sm" name="return_date_input"
+                                                               id="{{ $book[1]['option'] . '_' . $book[0]['id'] }}" type="date" value="{{ now()->addDay()->toDateString() }}"
+                                                               onfocus="this.min=$('input#{{ $book[1]['option'] . '_' . $book[0]['id'] }}').val();">
+                                                    </div>
+                                                </div>
+                                                <div class="col">
+                                                    <div class="input-group small">
+                                                        <span id="return_date" class="input-group-text w-50">Total: </span>
+                                                        <input class="form-control form-control-sm" name="total_date_input"
+                                                               id="{{ $book[1]['option'] . '_' . $book[0]['id'] }}" type="number" value="1" min="1">
+                                                    </div>
+                                                </div>
+                                            @endif
                                         </div>
                                     </td>
                                     <td class="small">
+                                        @if($book[0]->reader_id)
+                                            <div><span class="fw-semibold">@lang('lang.owner'):</span> {{ $book[0]->reader->name }}</div>
+                                        @endif
                                         <div><span class="fw-semibold">@lang('lang.name'):</span> {{ $book[0]->full_name }}</div>
                                         <div><span class="fw-semibold">@lang('lang.book-code'):</span> {{ $book[0]->book_code }}</div>
                                         <div><span class="fw-semibold">@lang('lang.pages'):</span> {{ $book[0]->page }}</div>
@@ -58,7 +84,9 @@
                                         <div><span class="fw-semibold">@lang('lang.option'):</span> {{ trans('lang.' . config('settings.purchase')[$book[1]['option']]) }}</div>
                                     </td>
                                     <td>
-                                        <a href="javascript:void(0);" class="bi-trash-fill text-danger" content="dislike" option="{{ $book[1]['option'] }}"  id="{{ $book[0]->id }}"></a>
+                                        <div class="col">
+                                            <a href="javascript:void(0);" class="btn btn-sm btn-danger bi-trash" content="dislike" option="{{ $book[1]['option'] }}"  id="{{ $book[0]->id }}"></a>
+                                        </div>
                                     </td>
                                 </tr>
                             @endforeach

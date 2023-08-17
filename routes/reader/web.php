@@ -10,6 +10,7 @@ use App\Http\Controllers\Reader\HomeController;
 use App\Http\Controllers\Reader\ShelfController;
 use App\Models\Book;
 use Illuminate\Support\Facades\Route;
+use Spatie\Honeypot\ProtectAgainstSpam;
 
 /*
 |--------------------------------------------------------------------------
@@ -50,7 +51,7 @@ Route::controller(BookController::class)
 
 Route::get('shelves/{id}/products', [ShelfController::class, 'shelfBooks'])->name('shelves.books');
 Route::resource('shelves', ShelfController::class);
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware('auth:reader');
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 Route::get('cart', [DashboardController::class, 'cart'])->name('cart');
 
 

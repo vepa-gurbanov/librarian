@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Reader;
 use App\Http\Controllers\Controller;
 use App\Models\Book;
 use App\Models\Option;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -14,16 +15,10 @@ use Illuminate\Support\Facades\Validator;
 
 class DashboardController extends Controller
 {
-    public function __construct()
-    {
-        auth('reader')->check();
-    }
-
     public function index()
     {
         $reader = auth('reader')->user();
         $cart = collect($this->getCookie());
-//return $cart;
         $inCartBooks = [];
         foreach ($cart as $item) {
             $inCartBooks[] = Book::query()->where('id', $item['id'])
@@ -39,16 +34,19 @@ class DashboardController extends Controller
                     });
                 })
                 ->with('reader')
-                ->get(['id', 'reader_id', 'full_name', 'slug', 'book_code', 'image', 'page', 'price', 'value', 'condition'])
+                ->get(['id', 'reader_id', 'full_name', 'slug', 'book_code', 'image', 'page', 'price', 'value', 'condition', 'created_at'])
                 ->add(['option' => $item['option'], 'price' => $item['price']]);
         }
 
-        $registeredBooks = Book::query()
-            ->whereHas('registrations', function (Builder $q) use ($reader) {
-                $q->where('reader_id', $reader['id']);
-            })
-            ->with(['registrations.user', 'reader'])
-            ->get();
+        $registeredBooks = collect([]);
+        if (auth('reader')->check()) {
+            $registeredBooks = Book::query()
+                ->whereHas('registrations', function (Builder $q) use ($reader) {
+                    $q->where('reader_id', $reader['id']);
+                })
+                ->with(['registrations.user', 'reader'])
+                ->get();
+        }
 
         $likedBooks = Book::query()
             ->whereIn('id', json_decode(Cookie::get('likedBooks'), true))
@@ -147,5 +145,16 @@ class DashboardController extends Controller
 
     public function getCookie() {
         return Cookie::has('cart') ? json_decode(Cookie::get('cart'), true) : [];
+    }
+
+
+    public function dateControl(Request $request) {
+        $receiveDate = Carbon::parse($request['receive_date_input']);
+        $totalDaysInput = $request['total_date_input'];
+
+        return response()->json([
+            'status' => 'success',
+            'receive_date' => $receiveDate->format('Y-m-d H:i:s'),
+        ], 200);
     }
 }
