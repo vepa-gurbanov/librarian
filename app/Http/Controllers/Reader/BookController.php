@@ -154,10 +154,6 @@ class BookController extends Controller
         $book = Book::query()->where('slug', $slug)
             ->with('ratedReaders', 'attributeValues.attribute', 'options', 'reviews.reader', 'notes.reader', 'categories:id,name,slug', 'authors')->first();
 
-        $cart = collect(Cookie::has('cart') ? json_decode(Cookie::get('cart'), true) : []);
-
-        $this->setCookie('viewedBooks', $book->id, ['success' => 'Added to viewed list', 'error' => 'Already in the viewed list'], 'viewed');
-
         $similars = Book::query()
             ->whereHas('categories', function ($q) use ($book) {
                 $q->whereIn('id', $book->categories()->pluck('id')->toArray());

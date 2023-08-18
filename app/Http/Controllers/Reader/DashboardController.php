@@ -69,36 +69,30 @@ class DashboardController extends Controller
                 'id' => ['required', 'integer', 'min:1'],
                 'option' => ['required', 'string', 'in:' . implode(',', array_keys(config('settings.purchase')))],
             ]);
-        } catch (\Exception $e) {
-            return $request->is('/cart')
-                ? redirect()->back()->with('error', $e->getMessage())
-                : response()->json(['status' => 'error', 'message' => $e->getMessage()], 400);
-        }
 
-        if (count($request->query()) <= 0) {
-            abort(404);
-        }
+            if (count($request->query()) <= 0) {
+                abort(404);
+            }
 
-        switch ($request->option) {
-            default:
-                $price = Book::query()->where('id', $request->id)->first('price')->price();
-                break;
-            case 'a':
-                $price = Option::query()->where('book_id', 200)->where('type', 'audiobook')
-                    ->first('price')->price;
-                break;
-            case 'e':
-                $price = Option::query()->where('book_id', 200)->where('type', 'electron')
-                    ->first('price')->price;
-                break;
-            case 'b':
-                $book_price = Book::query()->where('id', $request->id)->first('price')->price();
-                $option_price = Option::query()->where('book_id', $request->id)->sum('price');
-                $price = $book_price + $option_price;
-                break;
-        }
+            switch ($request->option) {
+                default:
+                    $price = Book::query()->where('id', $request->id)->first('price')->price();
+                    break;
+                case 'a':
+                    $price = Option::query()->where('book_id', 200)->where('type', 'audiobook')
+                        ->first('price')->price;
+                    break;
+                case 'e':
+                    $price = Option::query()->where('book_id', 200)->where('type', 'electron')
+                        ->first('price')->price;
+                    break;
+                case 'b':
+                    $book_price = Book::query()->where('id', $request->id)->first('price')->price();
+                    $option_price = Option::query()->where('book_id', $request->id)->sum('price');
+                    $price = $book_price + $option_price;
+                    break;
+            }
 
-        try {
             $res = $this->setCookie($request->id, $request->option, $price, remove: $request->has('remove'));
 
             return $request->is('/cart')

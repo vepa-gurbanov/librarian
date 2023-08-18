@@ -97,12 +97,13 @@
             @endif
         </ul>
 
-        <form class="d-flex" role="search" method="GET" action="{{ route('home') }}">
-            <div class="input-group">
-                <input type="text" class="form-control rounded-pill rounded-end-0" name="instant_search" placeholder="Search.." />
-                <button type="submit" class="input-group-text bg-primary rounded-pill rounded-start-0"><i class="bi-search"></i></button>
-            </div>
-        </form>
+        <div class="btn-group" role="group">
+            <button type="button" class="btn btn-sm btn-light rounded-pill rounded-end-0"
+                    data-bs-toggle="modal" data-bs-target="#registerModal" style="font-family: 'Courier New'">Sign up</button>
+            <button type="button" class="btn btn-sm btn-primary rounded-pill rounded-start-0"
+                    data-bs-toggle="modal" data-bs-target="#exampleModal" style="font-family: 'Courier New'">Log in</button>
+        </div>
+
     </div>
 </nav>
 
@@ -116,3 +117,68 @@
         @endforeach
     </nav>
 </div>
+
+<!-- Modal -->
+<div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content border-0 shadow rounded-4" style="background-color: #0b0c24; height: 500px; max-height: 500px">
+            <div class="modal-header border-0">
+                <button type="button" class="btn-close auth-close transition-colors" data-bs-dismiss="modal" aria-label="Close"><i class="bi-x-lg"></i></button>
+            </div>
+            <div class="modal-body d-flex justify-content-center align-items-center">
+
+                <div class="w-60">
+                    <div class="h2 text-white text-center">Log In</div>
+
+                    <div class="lct mb-3">
+                        <label for="phone" class="form-lct-label">Phone</label>
+                        <div class="d-flex align-items-center form-lct-group">
+                            <input type="text" class="form-lct-input letter-spacing-number" id="phone" name="phone" placeholder="Enter phone" autocomplete="false" autofocus required>
+                            <div class="position-relative right-0 form-lct-icon">
+                                <svg width="10" height="8" viewBox="0 0 10 8">
+                                    <path fill="#FFF" fill-rule="evenodd" stroke="#FFF" stroke-width=".728" d="M3.533 5.646l-2.199-2.19c-.195-.194-.488-.194-.684 0-.195.195-.195.487 0 .682l2.883 2.87L9.055 1.51c.195-.194.195-.487 0-.681-.196-.195-.49-.195-.685 0L3.533 5.646z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lct mb-3">
+                        <label for="email" class="form-lct-label">Email</label>
+                        <div class="d-flex align-items-center form-lct-group">
+                            <input type="email" class="form-lct-input" id="email" name="email" placeholder="Enter email" required>
+                            <div class="position-relative right-0 form-lct-icon">
+                                <svg width="10" height="8" viewBox="0 0 10 8">
+                                    <path fill="#FFF" fill-rule="evenodd" stroke="#FFF" stroke-width=".728" d="M3.533 5.646l-2.199-2.19c-.195-.194-.488-.194-.684 0-.195.195-.195.487 0 .682l2.883 2.87L9.055 1.51c.195-.194.195-.487 0-.681-.196-.195-.49-.195-.685 0L3.533 5.646z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lct mb-3">
+                        <label for="password" class="form-lct-label">Password</label>
+                        <div class="d-flex justify-content-between align-items-center form-lct-group">
+                            <div>
+                                <input type="password" class="form-lct-input" id="password" name="password" placeholder="Enter password" required>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <span class="lct-password-visible text-2xs">Show</span>
+                                <div class="position-relative right-0 form-lct-icon">
+                                    <svg width="10" height="8" viewBox="0 0 10 8">
+                                        <path fill="#FFF" fill-rule="evenodd" stroke="#FFF" stroke-width=".728" d="M3.533 5.646l-2.199-2.19c-.195-.194-.488-.194-.684 0-.195.195-.195.487 0 .682l2.883 2.87L9.055 1.51c.195-.194.195-.487 0-.681-.196-.195-.49-.195-.685 0L3.533 5.646z"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+

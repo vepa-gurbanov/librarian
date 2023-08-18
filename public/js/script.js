@@ -165,9 +165,6 @@ function addToCart() {
     if (window.location.href !== '/') {
         $('a[content=cart]').on('click', function () {
             let a = $(this);
-            let id = a.attr('id');
-            let option = a.attr('option');
-            let remove = a.attr('remove');
             let span = $(this).find('span');
 
             span.html('<img src="http://127.0.0.1:8000/img/loading.gif" width="16" height="16">')
@@ -175,37 +172,27 @@ function addToCart() {
             $.ajax({
                 url: '/cart',
                 method: 'GET',
-                data: {
-                    'id': id,
-                    'option': option,
-                    'remove': remove,
-                },
-                processData: false,
+                processData: true,
                 contentType: false,
                 dataType: 'json',
-                success: function (response) {
+                data: {
+                    'id': a.attr('id'),
+                    'option': a.attr('option'),
+                    'remove': a.attr('remove'),
+                },
+                success: function (response, textStatus, jqXHR) {
                     setTimeout(function () {
-                        if (response === 'added') {
-                            span.removeClass('text-dark');
-                            span.addClass('text-success');
-                            span.html('<i class="bi-cart-check-fill"></i>')
-                        } else if (response === 'removed') {
-                            span.removeClass('text-success');
-                            span.addClass('text-dark');
-                            span.html('<i class="bi-cart-plus-fill"></i>')
+                        if (response['key'] === 'added') {
+                            span.removeClass('text-dark').addClass('text-success').html('<i class="bi-cart-check-fill"></i>')
+                        } else if (response['key'] === 'removed') {
+                            span.removeClass('text-success').addClass('text-dark').html('<i class="bi-cart-plus-fill"></i>')
                         }
                     }, 100);
 
-                    // Live toast
-                    const toastBootstrap = bootstrap.Toast.getOrCreateInstance($('#liveToast'))
-                    $('#liveToast .toast-body').addClass('toast-body bg-success-subtle text-success-emphasis rounded');
-                    $('#liveToast .toast-body span#content').text(response);
-                    toastBootstrap.show()
-                    // Live toast
-
+                    liveToast(response['message'], 'bi-check-circle-fill', 'success')
                 },
-                error: function (jqXHR, textStatus, response) {
-                    /* some function */
+                error: function(jqXHR, textStatus, errorThrown){
+                    liveToast(jqXHR['responseJSON']['message'], 'bi-exclamation-triangle-fill', 'danger')
                 }
             });
         });
@@ -365,6 +352,36 @@ function liveToast(response, icon, textStatus) {
     toastBody.find('span#content').text(response);
     toastBootstrap.show()
 }
+
+function lctInputInit() {
+    $('input.form-lct-input').on('keyup', function () {
+        let regex = new RegExp('[a-z0-9]+@[a-z]+\\.[a-z]{2,3}');
+        console.log('target: ' + $(this).val().length)
+
+        if ($(this).val().length > 0 && $(this).attr('type') !== 'email') {
+            $(this).closest('.lct').find('.form-lct-icon').addClass('bg-primary')
+        } else if ($(this).val().length > 0 && $(this).attr('type') === 'email') {
+
+            if (regex.test($(this).val())) {
+                $(this).closest('.lct').find('.form-lct-icon').addClass('bg-primary')
+            } else {
+                $(this).closest('.lct').find('.form-lct-icon').removeClass('bg-primary')
+            }
+
+        } else {
+            $(this).closest('.lct').find('.form-lct-icon').removeClass('bg-primary')
+        }
+    })
+
+    $('.lct-password-visible').on('click', function () {
+        if ($(this).attr('type') === 'password') {
+            $(this).attr('type', 'text').text('Hide').closest('.lct').find('.form-lct-input').attr('type', 'text');
+        } else {
+            $(this).attr('type', 'password').text('Show').closest('.lct').find('.form-lct-input').attr('type', 'password');
+        }
+    })
+
+} lctInputInit()
 
 // $('input[name=total_date_input]').on('change', function () {
 //     let totalRentDaysCount = parseInt($(this).val());
