@@ -18,14 +18,18 @@ class LoginController extends Controller
         return view('reader.auth.login');
     }
 
-    public function store(Request $request): \Illuminate\Http\RedirectResponse
+    public function store(Request $request): \Illuminate\Http\JsonResponse
     {
         $validation = $request->validate([
             'phone' => ['required', 'integer', 'between:60000000,65999999'],
         ]);
 
         if (!Reader::where('phone', $validation['phone'])->exists()) {
-            return back()->with('error', 'Account doesn\'t exist!');
+            return response()->json([
+                'status' => 'error',
+                'message' => trans('lang.account_doesnt_exist')
+            ], 400);
+//            return back()->with('error', 'Account doesn\'t exist!');
         }
 
         $token = Str::random(60);
@@ -46,8 +50,15 @@ class LoginController extends Controller
         // return back()
 //        }
 
-        return to_route('verify', ['token' => $token])
-            ->with('status', 'Verification sent!');
+        return response()->json([
+            'code' => $code,
+            'token' => $token,
+            'status' => 'success',
+            'message' => trans('lang.verification-code-sent')
+        ], 200);
+
+//        return to_route('verify', ['token' => $token])
+//            ->with('status', 'Verification sent!');
     }
 
 

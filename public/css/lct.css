@@ -1,0 +1,118 @@
+.lct-link {
+    text-decoration: none;
+    color: rgb(186 217 252/1);
+    display: block;
+    margin-right: auto;
+    margin-left: auto;
+    margin-top: 1rem;
+}
+.lct-link:hover {
+    text-decoration: underline;
+}
+.flex-center {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+.lct-btn-primary {
+    display: block;
+    font-size: .8rem;
+    font-weight: 600;
+    letter-spacing: .2px;
+    text-align: center;
+    outline: 0;
+    border: 0;
+    border-radius: 15px;
+    min-height: 40px;
+    height: auto;
+    width: 100%;
+    background-color: #698EEB;
+}
+.lct-btn-primary:hover {
+    background-image: linear-gradient(to right, #00B8FF, #86A8E7);
+}
+.d-7 {font-size: 1.5rem}
+.w-60{
+    width: 60%!important;
+}
+.text-2xs {
+    font-size: .6666rem;
+}.text-sm {
+     font-size: .867rem;
+ }
+.text-gray-6 {
+    color: rgb(186 217 252/1);
+}
+.lct-password-visible {
+    color: var(--bs-gray-400);
+    -webkit-appearance: button;
+    background-color: transparent;
+    background-image: none;
+    font-family: Poppins,Helvetica,Arial,sans-serif;
+    cursor: pointer;
+    text-transform: none;
+    margin-left: .5rem;
+    padding-right: 1rem;
+    font-weight: bold;
+}
+.lct-modal {
+    background-color: rgb(13 19 29/1);
+    height: 500px;
+    max-height: 500px
+}
+.form-lct-icon {
+    margin-left: auto;
+    margin-right: 0;
+    height: 1.125rem;
+    width: 1.125rem;
+    padding: .25rem;
+    border-radius: 9999px;
+    background-color: rgba(186,217,252,.5);
+}
+.form-lct-icon svg {
+    margin-bottom: 1rem;
+}
+.form-lct-group {
+    width: auto;
+    display: block;
+    border-bottom: rgb(25 48 78/1) 1px solid !important;
+}
+.form-lct-input:focus {
+    background: transparent;
+    outline: 0;
+}
+.form-lct-input::placeholder {
+    color: var(--bs-gray-600);
+}
+.form-lct-input {
+    width: 100%;
+    margin-right: 20px;
+    height: 32px;
+    border: none;
+    border-radius: 0;
+    color: rgb(255 255 255/1);
+    background: 0 0;
+    letter-spacing: 1px;
+}
+.form-lct-label {
+    opacity: 60%;
+    /*font-weight: var(--bs-gray-600);*/
+    color: rgb(255 255 255/1);
+    font-weight: 600;
+    font-size: .6666rem;
+}
+.letter-spacing-number {
+    letter-spacing: 2px;
+}
+
+.step-bar {
+    color: gray;
+    margin: .05rem;
+}
+.step-content {
+    border-bottom: rgba(108,117,125, 1) 3px solid;
+}
+.step-content.step-active {
+    border-bottom: rgba(13,110,253, 1) 3px solid;
+    color: rgba(13,110,253, 1);
+}

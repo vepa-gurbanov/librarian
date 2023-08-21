@@ -41,7 +41,7 @@
             <form method="GET" action="{{ route('cart') }}" id="addToCart{{ $value->id }}">
                 <input type="hidden" name="id" value="{{ $value->id }}">
                 <input type="hidden" name="option" value="r">
-                <input type="hidden" name="remove" value="{{ $inCart }}">
+                <input type="hidden" name="remove" value="{{ in_array($value->id, $inCart) }}">
             </form>
         @endif
     </div>

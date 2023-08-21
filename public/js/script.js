@@ -1,3 +1,11 @@
+const textPrimary = 'rgba(13,110,253, 1)';
+const textSecondary = 'rgba(108,117,125, 1)';
+const loadingImage = '<img src="http://127.0.0.1:8000/img/loading.gif" style="width: 24px">';
+const loadingImageSM = '<img src="http://127.0.0.1:8000/img/loading.gif" width="16" height="16">';
+const loadingSuccess = '<i class="bi-check-circle-fill text-success d-7"></i>';
+const loadingSuccessXXL = '<i class="bi-check-circle-fill text-success display-1"></i>';
+const loadingError = '<i class="bi-x-circle-fill text-danger d-7"></i>';
+
 $(document).ready(function () {
     $('input, textarea').addClass('bordered');
     $.ajaxSetup({
@@ -13,7 +21,7 @@ $(document).ready(function () {
 
     $('table.dataTable').each(function () {
         initDatatables('#' + $(this).attr('id'), $(this).attr('searchable'));
-    })
+    });
 
     (() => {
         'use strict'
@@ -22,6 +30,7 @@ $(document).ready(function () {
         })
     })()
 });
+function con(e) {console.log(e)}
 
 
 function swiperSlider() {
@@ -130,7 +139,7 @@ function like() {
         let span = $(this).find('span');
         let totalLikes = $('span#book' + id);
 
-        span.html('<img src="http://127.0.0.1:8000/img/loading.gif" width="16" height="16">');
+        span.html(loadingImage);
 
         $.ajax({
             url: '/book/' + id + '/like',
@@ -167,7 +176,7 @@ function addToCart() {
             let a = $(this);
             let span = $(this).find('span');
 
-            span.html('<img src="http://127.0.0.1:8000/img/loading.gif" width="16" height="16">')
+            span.html(loadingImageSM)
 
             $.ajax({
                 url: '/cart',
@@ -352,36 +361,6 @@ function liveToast(response, icon, textStatus) {
     toastBody.find('span#content').text(response);
     toastBootstrap.show()
 }
-
-function lctInputInit() {
-    $('input.form-lct-input').on('keyup', function () {
-        let regex = new RegExp('[a-z0-9]+@[a-z]+\\.[a-z]{2,3}');
-        console.log('target: ' + $(this).val().length)
-
-        if ($(this).val().length > 0 && $(this).attr('type') !== 'email') {
-            $(this).closest('.lct').find('.form-lct-icon').addClass('bg-primary')
-        } else if ($(this).val().length > 0 && $(this).attr('type') === 'email') {
-
-            if (regex.test($(this).val())) {
-                $(this).closest('.lct').find('.form-lct-icon').addClass('bg-primary')
-            } else {
-                $(this).closest('.lct').find('.form-lct-icon').removeClass('bg-primary')
-            }
-
-        } else {
-            $(this).closest('.lct').find('.form-lct-icon').removeClass('bg-primary')
-        }
-    })
-
-    $('.lct-password-visible').on('click', function () {
-        if ($(this).attr('type') === 'password') {
-            $(this).attr('type', 'text').text('Hide').closest('.lct').find('.form-lct-input').attr('type', 'text');
-        } else {
-            $(this).attr('type', 'password').text('Show').closest('.lct').find('.form-lct-input').attr('type', 'password');
-        }
-    })
-
-} lctInputInit()
 
 // $('input[name=total_date_input]').on('change', function () {
 //     let totalRentDaysCount = parseInt($(this).val());
