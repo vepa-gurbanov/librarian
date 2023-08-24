@@ -23,5 +23,10 @@ return [
     'published' => 'Published',
     'viewed' => 'Viewed',
     'liked' => 'Liked',
+    'disliked' => 'Disliked',
     'isbn' => 'ISBN code',
+    'image' => 'Image',
+    'days' => 'Days',
+    'description' => 'Description',
+    'tools' => 'Tools',
 ];

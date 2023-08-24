@@ -5,10 +5,12 @@ namespace App\Http\Controllers\Reader\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\Reader;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use function PHPUnit\Framework\isJson;
 
 class VerificationController extends Controller
 {
@@ -22,36 +24,47 @@ class VerificationController extends Controller
             ->with(['request' => $request, 'phone' => $phone]);
     }
 
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
-        $validation = $request->validate([
-            'name' => ['nullable', 'string'],
-            'phone' => ['required', 'integer', 'between:60000000,65999999'],
-            'token' => ['required', 'sometimes'],
-            'code' => ['required', 'integer', 'between:10000, 99999'],
-        ]);
+//        return response()->json(['request' => [
+//            $request->name, $request->phone, $request->token, $request->code,
+//        ]], 200);
+        try {
+            $request->validate([
+                'name' => ['sometimes', 'string'],
+                'phone' => ['required', 'integer', 'between:60000000,65999999'],
+                'token' => ['sometimes'],
+                'code' => ['required', 'integer', 'between:10000, 99999'],
+            ]);
+
+        } catch (\Exception $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $exception->getMessage(),
+            ], 400);
+        }
 
         $name = $request->has('name');
-
         $verifiable = DB::table('password_reset_tokens')
-            ->where('phone', $validation['phone'])
-            ->when($request->has('token'), function ($q) use ($validation) {
-                $q->where('token', $validation['token']);
+            ->where('phone', $request->phone)
+            ->where('code', $request->code)
+            ->when($request->has('token'), function ($q) use ($request) {
+                $q->where('token', $request->token);
             })
             ->first();
 
         if (isset($verifiable) && $verifiable->code_expires_at < now()) {
             return response()->json(['status' => 'error', 'message' => 'Verification code expired! Try resend.']);
 //            return back()->with('error', 'Verification code expired! Try resend.');
-        } elseif ($verifiable->code !== $validation['code']) {
+        } elseif ($verifiable->code !== $request->code) {
             return response()->json(['status' => 'error', 'message' => 'Verification code incorrect! Try again.']);
 //            return back()->with('error', 'Verification code incorrect! Try again.');
-        } else {
+        } elseif(isset($verifiable)) {
             if ($name) {
                 $user = Reader::create([
-                    'name' => $validation['name'],
-                    'phone' => $validation['phone'],
-                    'password' => $validation['code']
+                    'name' => $request->name,
+                    'phone' => $request->phone,
+                    'password' => $request->code
                 ]);
 
                 try {
@@ -65,8 +78,8 @@ class VerificationController extends Controller
 //                        ->with('error', $e->getMessage());
                 }
             } else {
-                $user = Reader::where('phone', $validation['phone'])->first();
-                $user->update(['password' => $validation['code']]);
+                $user = Reader::where('phone', $request->phone)->first();
+                $user->update(['password' => $request->code]);
                 try {
                     Auth::guard('reader')->login($user);
                     return response()->json(['status' => 'success', 'message' => 'Logged in!'], 200);
@@ -78,6 +91,8 @@ class VerificationController extends Controller
 //                        ->with('error', $e->getMessage());
                 }
             }
+        } else {
+            return response()->json(['status' => 'error', 'message' => trans('lang.failed')]);
         }
     }
 

@@ -9,7 +9,7 @@
         @php
             use \Illuminate\Support\Facades\Cookie;
                 $liked = in_array($value->id, Cookie::has('likedBooks') ? json_decode(Cookie::get('likedBooks'), true) : []) ? 'text-danger' : 'text-dark';
-                $inCart = Cookie::has('cart') ? in_array($value->id, collect(json_decode(Cookie::get('cart'), true))->where('option', 'r')->pluck('id')->toArray()) : [];
+                $inCart = in_array($value->id, Cookie::has('cart') ? collect(json_decode(Cookie::get('cart'), true))->where('option', 'r')->pluck('id')->toArray()  : []);
         @endphp
 
         @if($key === 'shelf')
@@ -41,7 +41,7 @@
             <form method="GET" action="{{ route('cart') }}" id="addToCart{{ $value->id }}">
                 <input type="hidden" name="id" value="{{ $value->id }}">
                 <input type="hidden" name="option" value="r">
-                <input type="hidden" name="remove" value="{{ in_array($value->id, $inCart) }}">
+                <input type="hidden" name="remove" value="{{ $inCart }}">
             </form>
         @endif
     </div>

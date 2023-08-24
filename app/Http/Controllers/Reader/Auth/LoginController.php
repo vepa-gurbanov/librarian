@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Reader\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\Reader;
+use http\Client\Response;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -51,7 +53,6 @@ class LoginController extends Controller
 //        }
 
         return response()->json([
-            'code' => $code,
             'token' => $token,
             'status' => 'success',
             'message' => trans('lang.verification-code-sent')

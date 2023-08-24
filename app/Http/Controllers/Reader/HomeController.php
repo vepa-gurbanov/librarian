@@ -19,6 +19,8 @@ class HomeController extends Controller
 {
     public function index(Request $request)
     {
+//        $inCart = Cookie::has('cart') ? in_array(200, collect(json_decode(Cookie::get('cart'), true))->where('option', 'r')->pluck('id')->toArray()) : [];
+//return $inCart;
         $top = Book::query()
             ->orderBy('liked', 'desc')
             ->take(10)

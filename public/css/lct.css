@@ -116,3 +116,8 @@
     border-bottom: rgba(13,110,253, 1) 3px solid;
     color: rgba(13,110,253, 1);
 }
+.ow {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    hyphens: auto;
+}

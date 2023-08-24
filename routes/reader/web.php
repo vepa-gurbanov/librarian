@@ -28,8 +28,8 @@ Route::post('/0auth', [RegisterController::class, 'store']);
 Route::get('/0auth1', [LoginController::class, 'create'])->name('login');
 Route::post('/0auth1', [LoginController::class, 'store']);
 Route::post('/0auth2r/{token}', [VerificationController::class, 'resend'])->name('resend');
-Route::get('/0auth2/{token?}', [VerificationController::class, 'create'])->name('verify');
-Route::post('/0auth2/{token?}', [VerificationController::class, 'store']);
+Route::get('/0auth2', [VerificationController::class, 'create'])->name('verify');
+Route::post('/0auth2', [VerificationController::class, 'store']);
 Route::post('/0auth1/logout', [LoginController::class, 'destroy'])->name('logout')->middleware('auth:reader');
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -49,7 +49,7 @@ Route::controller(BookController::class)
         Route::get('book/{id}/like', 'like')->name('book.like');
     });
 
-Route::get('shelves/{id}/products', [ShelfController::class, 'shelfBooks'])->name('shelves.books');
+Route::get('shelves/{id}/books', [ShelfController::class, 'shelfBooks'])->name('shelves.books');
 Route::resource('shelves', ShelfController::class);
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 Route::get('cart', [DashboardController::class, 'cart'])->name('cart');

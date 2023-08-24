@@ -221,7 +221,7 @@
                                     <td>{{ $book->full_name }}</td>
                                     <td>{!! $book->priceFormat('price') !!}</td>
                                     <td>
-                                        <a href="javascript:void(0);" class="bi-trash-fill text-danger" content="like"  id="{{ $book->id }}"></a>
+                                        <a href="javascript:void(0);" class="bi-trash-fill text-danger" content="dislike" id="{{ $book->id }}"></a>
                                     </td>
                                 </tr>
                             @endforeach

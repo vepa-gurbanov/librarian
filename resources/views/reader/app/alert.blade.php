@@ -59,7 +59,7 @@
 
 <div class="toast-container position-fixed bottom-0 end-0 top-0 p-3">
     <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="toast-body">
+        <div class="toast-body" id="toast-body">
             <span id="icon"></span>
             <span id="content"></span>
         </div>

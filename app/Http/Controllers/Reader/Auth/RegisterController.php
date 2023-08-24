@@ -19,36 +19,46 @@ class RegisterController extends Controller
         return view('reader.auth.register');
     }
 
-    public function store(Request $request): \Illuminate\Http\RedirectResponse
+    public function store(Request $request): \Illuminate\Http\JsonResponse
     {
-        $validation = $request->validate([
-            'name' => ['required', 'string'],
-            'phone' => ['required', 'integer', 'between:60000000,65999999'],
-        ]);
+        try {
+            $validation = $request->validate([
+                'name' => ['required', 'string'],
+                'phone' => ['required', 'integer', 'between:60000000,65999999'],
+            ]);
 
-        if (Reader::where('phone', $validation['phone'])->exists()) {
-            return back()->with('error', 'Account exist!');
-        }
+            if (Reader::where('phone', $validation['phone'])->exists()) {
+                return response()->json(['status' => 'error', 'message' => trans('lang.account_exists_try_login')], 400);
+//                return back()->with('error', 'Account exist!');
+            }
 
-        $token = Str::random(60);
-        $code = mt_rand(10000, 99999);
-        DB::table('password_reset_tokens')
-            ->updateOrInsert(
-                ['phone' => $validation['phone']],
-                [
-                    'token' => $token,
-                    'code' => $code,
-                    'code_expires_at' => now()->addMinutes(10),
-                ]
-            );
+            $token = Str::random(60);
+            $code = mt_rand(10000, 99999);
+            DB::table('password_reset_tokens')
+                ->updateOrInsert(
+                    ['phone' => $validation['phone']],
+                    [
+                        'token' => $token,
+                        'code' => $code,
+                        'code_expires_at' => now()->addMinutes(10),
+                    ]
+                );
 
 //        try {
             // Here:send $code to $validation['phone']
 //        } catch (\Exception $e) {
             // return back()
 //        }
+            return response()->json([
+                'name' => $request->name,
+                'status' => 'success',
+                'message' => trans('lang.verification-sent') . 'The code is: ' . $code . '. This is just demo'
+            ], 201);
 
-        return to_route('verify', ['token' => $token . '?name=' . $validation['name']])
-            ->with('status', 'Verification sent!');
+//            return to_route('verify', ['token' => $token . '?name=' . $validation['name']])
+//                ->with('status', 'Verification sent!');
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 400);
+        }
     }
 }

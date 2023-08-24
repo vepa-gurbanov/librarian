@@ -5,6 +5,9 @@ const loadingImageSM = '<img src="http://127.0.0.1:8000/img/loading.gif" width="
 const loadingSuccess = '<i class="bi-check-circle-fill text-success d-7"></i>';
 const loadingSuccessXXL = '<i class="bi-check-circle-fill text-success display-1"></i>';
 const loadingError = '<i class="bi-x-circle-fill text-danger d-7"></i>';
+const errorIconClass = 'bi-exclamation-triangle-fill';
+const successIconClass = 'bi-check-circle-fill';
+function con(e) {console.log(e)}
 
 $(document).ready(function () {
     $('input, textarea').addClass('bordered');
@@ -29,8 +32,12 @@ $(document).ready(function () {
             $('.offcanvas-collapse').classList.toggle('open')
         })
     })()
+
+    $('a#i_have_code').on('click', function () {
+        $('button#verify-tab').click();
+    })
+
 });
-function con(e) {console.log(e)}
 
 
 function swiperSlider() {
@@ -51,6 +58,7 @@ function swiperSlider() {
         },
     });
 } swiperSlider();
+
 
 function swiperMain() {
     $('.swiperContent').each(function () {
@@ -77,6 +85,7 @@ function swiperMain() {
     });
 } swiperMain();
 
+
 function swiperAuthors() {
     new Swiper('.swiperAuthors', {
         loop: true,
@@ -89,6 +98,7 @@ function swiperAuthors() {
         autoplay: true,
     })
 } swiperAuthors();
+
 
 function rate() {
     $('input:radio[name=rate]').on('click', function () {
@@ -114,6 +124,7 @@ function rate() {
 }
 rate()
 
+
 function collapse() {
     let collapse = $('a[data-bs-toggle="collapse"]');
     // collapse.text(collapse.text() + '(Show)');
@@ -136,10 +147,10 @@ function like() {
     $('a[content=like]').on('click', function () {
         let a = $(this);
         let id = a.attr('id');
-        let span = $(this).find('span');
+        let span = a.find('span');
         let totalLikes = $('span#book' + id);
 
-        span.html(loadingImage);
+        span.html(loadingImageSM);
 
         $.ajax({
             url: '/book/' + id + '/like',
@@ -147,7 +158,7 @@ function like() {
             processData: false,
             contentType: false,
             dataType: 'json',
-            success: function (response, textStatus, jqXHR) {
+            success: function (response) {
                 $.each(response, function (key, value) {
                     console.log(key + ': ' + value)
                 })
@@ -160,15 +171,33 @@ function like() {
                         totalLikes.text(parseInt(totalLikes.text()) - 1);
                     }
                 }, 100);
-                liveToast(response['message'], 'bi-check-circle-fill', 'success')
+                liveToast(response['message'], successIconClass, 'success')
             },
-            error: function(jqXHR, textStatus, errorThrown){
-                liveToast(jqXHR['responseJSON']['message'], 'bi-exclamation-triangle-fill', 'danger')
+            error: function(jqXHR){
+                liveToast(jqXHR['responseJSON']['message'], errorIconClass, 'danger')
             }
         });
     });
 } like();
 
+
+function dislikeInCart() {
+    $('a[content=dislike]').on('click', function () {
+        $(this).removeClass().html(loadingImageSM)
+        $.ajax({
+            url: '/book/' + $(this).attr('id') + '/like',
+            method: 'GET',
+            processData: false,
+            contentType: false,
+            dataType: 'json',
+            success: () => {
+                $(this).parent().parent().fadeOut();
+                location.reload()
+            }
+        })
+    })
+}
+dislikeInCart()
 
 function addToCart() {
     if (window.location.href !== '/') {
@@ -189,7 +218,7 @@ function addToCart() {
                     'option': a.attr('option'),
                     'remove': a.attr('remove'),
                 },
-                success: function (response, textStatus, jqXHR) {
+                success: function (response) {
                     setTimeout(function () {
                         if (response['key'] === 'added') {
                             span.removeClass('text-dark').addClass('text-success').html('<i class="bi-cart-check-fill"></i>')
@@ -198,10 +227,10 @@ function addToCart() {
                         }
                     }, 100);
 
-                    liveToast(response['message'], 'bi-check-circle-fill', 'success')
+                    liveToast(response['message'], successIconClass, 'success')
                 },
-                error: function(jqXHR, textStatus, errorThrown){
-                    liveToast(jqXHR['responseJSON']['message'], 'bi-exclamation-triangle-fill', 'danger')
+                error: function(jqXHR){
+                    liveToast(jqXHR['responseJSON']['message'], errorIconClass, 'danger')
                 }
             });
         });
@@ -209,13 +238,15 @@ function addToCart() {
 }
 addToCart();
 
-function hideAlertToast() {
-    if ($(document).has('#toast')) {
-        setTimeout(function () {
-            $('#toast').fadeOut();
-        }, 3000)
-    }
-} hideAlertToast();
+
+// function hideAlertToast() {
+//     if ($(document).has('.toast')) {
+//         setTimeout(function () {
+//             $('.toast').fadeOut();
+//         }, 3000)
+//     }
+// }
+
 
 function liveSearch() {
     /* Starts live search */
@@ -245,6 +276,7 @@ function liveSearch() {
     });
     /* End live search */
 } liveSearch()
+
 
 function initDatatables(selector, searchable = false) {
     if (searchable) {
@@ -281,20 +313,25 @@ function initDatatables(selector, searchable = false) {
     }
 }
 
+
 function removeFromCart() {
     $('td a[content=removeFromCart]').on('click', function () {
-        $(this).closest('tr').fadeOut();
+        $(this).removeClass('btn-danger bi-trash').html(loadingImageSM)
         $.ajax({
+            url: '/cart',
             method: 'GET',
             data: {
                 'id': $(this).attr('id'),
                 'option': $(this).attr('option'),
                 'remove': true,
             },
-            url: '/cart',
+            success: function () {
+                location.reload();
+            }
         });
     });
 } removeFromCart()
+
 
 function date() {
     $.each(['receive', 'return'], function (k, v) {
@@ -353,13 +390,20 @@ function date() {
     });
 } date()
 
+
 function liveToast(response, icon, textStatus) {
     const toastBootstrap = bootstrap.Toast.getOrCreateInstance($('#liveToast'))
-    let toastBody = $('#liveToast .toast-body');
-    toastBody.addClass(`toast-body bg-${textStatus}-subtle text-${textStatus}-emphasis rounded`);
+    let toastBody = $('#liveToast #toast-body');
+    let toastClass = `bg-${textStatus}-subtle text-${textStatus}-emphasis`;
+    toastBody.addClass(`toast-body rounded ${toastClass}`);
     toastBody.find('span#icon').addClass(icon);
-    toastBody.find('span#content').text(response);
+    toastBody.find('span#content').html(response);
     toastBootstrap.show()
+
+   setTimeout(() => {
+        toastBody.removeClass(toastClass)
+        toastBootstrap.hide()
+    }, 3000)
 }
 
 // $('input[name=total_date_input]').on('change', function () {

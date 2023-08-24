@@ -149,7 +149,9 @@
                         <div>{{ trans('lang.viewed') . ': ' . $book->viewed }}</div>
                         <div>
                             @lang('lang.liked') :
-                            <a href="javascript:void(0);" class="bi-hand-thumbs-up-fill {{ $liked }}" content="like"  id="{{ $book->id }}"></a>
+                            <a href="javascript:void(0);" class="text-decoration-none" content="like"  id="{{ $book->id }}">
+                                <span class="{{ $liked }}"><i class="bi-hand-thumbs-up-fill"></i></span>
+                            </a>
                             <span id="book{{ $book->id }}">{{ $book->liked }}</span>
                         </div>
                         <div>{{ trans('lang.isbn') . ': ' . $book->book_code }}</div>

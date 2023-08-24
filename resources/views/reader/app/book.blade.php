@@ -15,11 +15,12 @@
     <div class="mb-1">
         {{ $book->name }}
     </div>
-    <div class="d-block mt-auto w-100">
+    <div class="d-block mt-auto">
         @php
             use \Illuminate\Support\Facades\Cookie;
                 $liked = in_array($book->id, Cookie::has('likedBooks') ? json_decode(Cookie::get('likedBooks'), true) : []) ? 'text-danger' : 'text-dark';
-                $inCart = Cookie::has('cart') ? in_array($book->id, collect(json_decode(Cookie::get('cart'), true))->where('option', 'r')->pluck('id')->toArray()) : [];
+                $inCart = in_array($book->id, Cookie::has('cart') ? collect(json_decode(Cookie::get('cart'), true))->where('option', 'r')->pluck('id')->toArray() :  []);
+//                $inCart = Cookie::has('cart') ? in_array($book->id, collect(json_decode(Cookie::get('cart'), true))->where('option', 'r')->pluck('id')->toArray()) : [];
         @endphp
         <a href="javascript:void(0);" id="{{ $book->id }}" content="like" class="text-decoration-none bg-success-subtle rounded-start ps-1">
             <span class="{{ $liked }}">

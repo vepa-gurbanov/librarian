@@ -19,7 +19,7 @@
         <div class="d-flex align-items-center form-lct-group">
             <input type="text" class="form-lct-input letter-spacing-number" id="phone" name="phone" placeholder="Enter phone" autocomplete="false" required>
             <div class="position-relative right-0 form-lct-icon">
-                <svg id="true" width="10" height="8" viewBox="0 0 10 8">
+                <svg width="10" height="8" viewBox="0 0 10 8">
                     <path fill="#FFF" fill-rule="evenodd" stroke="#FFF" stroke-width=".728" d="M3.533 5.646l-2.199-2.19c-.195-.194-.488-.194-.684 0-.195.195-.195.487 0 .682l2.883 2.87L9.055 1.51c.195-.194.195-.487 0-.681-.196-.195-.49-.195-.685 0L3.533 5.646z"></path>
                 </svg>
             </div>
@@ -42,6 +42,6 @@
 
     <button type="button" class="lct-btn-primary flex-center my-3" name="verify">Verify</button>
 
-    <a href="#" class="lct-link text-sm flex-center">Resend?</a>
-    <a href="#" class="lct-link text-sm flex-center">Sign up</a>
+    <a href="javascript:void(0);" class="lct-link text-sm flex-center">Resend?</a>
+    <a href="javascript:void(0);" class="lct-link text-sm flex-center" onclick="$('button[name=register]').click()" >Sign up</a>
 </form>
