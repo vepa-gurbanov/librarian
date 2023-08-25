@@ -9,6 +9,8 @@ const errorIconClass = 'bi-exclamation-triangle-fill';
 const successIconClass = 'bi-check-circle-fill';
 function con(e) {console.log(e)}
 
+console.log(JSON.parse(localStorage.getItem('ddd'))['tel'])
+
 $(document).ready(function () {
     $('input, textarea').addClass('bordered');
     $.ajaxSetup({

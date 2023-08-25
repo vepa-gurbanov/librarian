@@ -97,12 +97,7 @@
             @endif
         </ul>
 
-        <div class="btn-group" role="group">
-            <button type="button" class="btn btn-sm btn-light rounded-pill rounded-end-0"
-                    data-bs-toggle="modal" data-bs-target="#registerModal" style="font-family: 'Courier New'">Sign up</button>
-            <button type="button" class="btn btn-sm btn-primary rounded-pill rounded-start-0"
-                    data-bs-toggle="modal" data-bs-target="#loginModal" style="font-family: 'Courier New'">Log in</button>
-        </div>
+        <button class="btn btn-sm btn-outline-primary" data-bs-target="#loginModal" data-bs-toggle="modal">Join Us</button>
 
     </div>
 </nav>
@@ -118,35 +113,141 @@
     </nav>
 </div>
 
-<!-- Modal -->
-<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content border-0 shadow rounded-4" style="background-color: #0b0c24; height: 500px; max-height: 500px">
-            <div class="modal-header border-0">
-                <div class="d-flex justify-content-start">
-                    <div class="nav nav-pills me-3" id="v-pills-tab" role="tablist" aria-orientation="horizontal">
-                        <button class="nav-link text-gray-6 active" id="login-tab" data-bs-toggle="pill" data-bs-target="#login" type="button" role="tab" aria-controls="login" aria-selected="true">Login</button>
-                        <button class="nav-link text-gray-6" id="register-tab" data-bs-toggle="pill" data-bs-target="#register" type="button" role="tab" aria-controls="register" aria-selected="false">Register</button>
-                        <button class="nav-link text-gray-6" id="verify-tab" data-bs-toggle="pill" data-bs-target="#verify" type="button" role="tab" aria-controls="verify" aria-selected="false">Verify</button>
-                    </div>
-                </div>
-                <button type="button" class="btn-close auth-close transition-colors" data-bs-dismiss="modal" aria-label="Close"><i class="bi-x-lg"></i></button>
-            </div>
-            <div class="modal-body d-flex justify-content-center align-items-center">
-                <div class="tab-content text-white" id="v-pills-tabContent">
-                    <div class="tab-pane fade show active" id="login" role="tabpanel" aria-labelledby="login-tab" tabindex="0">
-                        @include('reader.auth.login-modal')
-                    </div>
-                    <div class="tab-pane fade" id="register" role="tabpanel" aria-labelledby="register-tab" tabindex="0">
-                        @include('reader.auth.register-modal')
-                    </div>
-                    <div class="tab-pane fade" id="verify" role="tabpanel" aria-labelledby="verify-tab" tabindex="0">
-                        @include('reader.auth.verify-modal')
-                    </div>
-                </div>
 
+
+<div class="modal" id="registerModal" aria-hidden="true" aria-labelledby="registerModalLabel" tabindex="-1">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header border-bottom-0">
+                <h1 class="modal-title fs-5" id="registerModalLabel">
+                    <button class="btn btn-sm btn-outline-primary" name="loginModal" data-bs-target="#loginModal" data-bs-toggle="modal">Login</button>
+                    <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Current page">Register</button>
+                    <button class="btn btn-sm btn-outline-primary" name="verifyModal" data-bs-target="#verifyModal" data-bs-toggle="modal">I have Code</button>
+                </h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-5">
+                <div class="text-center">
+                    <h4>Sign up</h4>
+                    <p>Sign up to continue</p>
+                </div>
+                <form action="{{ route('register') }}" method="POST" id="registerForm" class="row g-3 mx-5 needs-validation" novalidate>
+                    @csrf
+                    @method('POST')
+                    @honeypot
+                    <div class="mb-3">
+                        <label for="register-name" class="form-label fw-semibold">Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control form-control-sm" name="name" id="register-name" placeholder="ex: St Jones" autocomplete="off" autofocus required>
+                        <div id="register-name-feedback"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="register-phone" class="form-label fw-semibold">Phone <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text" id="registerPhone">+993</span>
+                            <input type="text" class="form-control form-control-sm" name="phone" id="register-phone" aria-describedby="registerPhone" placeholder="60000000" autocomplete="off" required>
+                        </div>
+                        <div name="feedback"></div>
+                    </div>
+                    <div class="mb-3">
+                        <button type="button" name="register" class="btn btn-sm btn-primary w-100">Get Verification code</button>
+{{--                        <button type="button" name="register" class="btn btn-sm btn-primary w-100" data-bs-target="#verifyModal" data-bs-toggle="modal">Get Verification code</button>--}}
+                    </div>
+                    <p class="resend text-center text-muted mb-0">
+                        Already registered? <a href="javascript:void(0);" onclick="$('[name=loginModal]').click()">Log In</a>
+                    </p>
+                </form>
+            </div>
+            <div class="modal-footer border-top-0">
+                <button type="button" class="btn btn-sm btn-light" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
 </div>
 
+<div class="modal" id="loginModal" aria-hidden="true" aria-labelledby="loginModalLabel" tabindex="-1">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header border-bottom-0">
+                <h1 class="modal-title fs-5" id="loginModalLabel">
+                    <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Current page">Login</button>
+                    <button class="btn btn-sm btn-outline-primary" name="registerModal" data-bs-target="#registerModal" data-bs-toggle="modal">Register</button>
+                    <button class="btn btn-sm btn-outline-primary" name="verifyModal" data-bs-target="#verifyModal" data-bs-toggle="modal">I have Code</button>
+                </h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-5">
+                <div class="text-center">
+                    <h4>Sign in</h4>
+                    <p>Sign in to continue</p>
+                </div>
+                <form action="{{ route('login') }}" method="POST" id="loginForm" class="row g-3 mx-5 needs-validation" novalidate>
+                    @csrf
+                    @method('POST')
+                    @honeypot
+                    <div class="mb-3">
+                        <label for="login-phone" class="form-label fw-semibold">Phone <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text" id="loginPhone">+993</span>
+                            <input type="text" class="form-control form-control-sm" name="phone" id="login-phone" aria-describedby="loginPhone" placeholder="60000000" autocomplete="off" autofocus required>
+                        </div>
+                        <div name="feedback"></div>
+                    </div>
+                    <div class="mb-3">
+                        <button type="button" name="login" class="btn btn-sm btn-primary w-100">Get Verification code</button>
+{{--                        <button type="button" name="login" class="btn btn-sm btn-primary w-100" data-bs-target="#verifyModal" data-bs-toggle="modal">Get Verification code</button>--}}
+                    </div>
+                    <p class="resend text-center text-muted mb-0">
+                        Don't you have account? <a href="javascript:void(0);" onclick="$('[name=registerModal]').click()">Sign up</a>
+                    </p>
+                </form>
+            </div>
+            <div class="modal-footer border-top-0">
+                <button type="button" class="btn btn-sm btn-light" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="verifyModal" aria-hidden="true" aria-labelledby="verifyModalLabel" tabindex="-1">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header border-bottom-0">
+                <h1 class="modal-title fs-5" id="verifyModalLabel2">
+                    <button class="btn btn-sm btn-outline-primary" name="loginModal" data-bs-target="#loginModal" data-bs-toggle="modal">Login</button>
+                    <button class="btn btn-sm btn-outline-primary" name="registerModal" data-bs-target="#registerModal" data-bs-toggle="modal">Register</button>
+                    <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Current page">I have Code</button>
+                </h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-5 text-center">
+                <form action="{{ route('verify') }}" method="POST">
+                    @csrf
+                    @method('POST')
+                    @honeypot
+                    <h4>Verify</h4>
+                    <p>Your code was sent to "your phone"</p>
+
+                    <div class="otp-field mb-4">
+                        <input type="number" class="otp-input" />
+                        <input type="number" class="otp-input" disabled />
+                        <input type="number" class="otp-input" disabled />
+                        <input type="number" class="otp-input" disabled />
+                        <input type="number" class="otp-input" disabled />
+                        <button type="button" name="clearOtpInput" class="btn btn-outline-danger otp-input">×</button>
+                    </div>
+
+                    <button type="button" name="verify" class="btn btn-primary mb-3">
+                        Verify
+                    </button>
+
+                    <p class="resend text-muted mb-0">
+                        Didn't receive code? <a href="">Request again</a>
+                    </p>
+                </form>
+            </div>
+            <div class="modal-footer border-top-0">
+                <button type="button" class="btn btn-sm btn-light" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

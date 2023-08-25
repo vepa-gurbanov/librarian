@@ -26,7 +26,7 @@ class VerificationController extends Controller
 
     public function store(Request $request): JsonResponse
     {
-//        return response()->json(['request' => [
+//        return response()->json(['status' => 'error', 'message' => [
 //            $request->name, $request->phone, $request->token, $request->code,
 //        ]], 200);
         try {

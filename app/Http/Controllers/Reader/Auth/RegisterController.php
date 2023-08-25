@@ -50,7 +50,7 @@ class RegisterController extends Controller
             // return back()
 //        }
             return response()->json([
-                'name' => $request->name,
+                'token' => $token,
                 'status' => 'success',
                 'message' => trans('lang.verification-sent') . 'The code is: ' . $code . '. This is just demo'
             ], 201);

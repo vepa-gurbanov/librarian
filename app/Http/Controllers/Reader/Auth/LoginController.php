@@ -65,6 +65,12 @@ class LoginController extends Controller
 
     public function destroy(Request $request): RedirectResponse
     {
+//        DB::table('password_reset_tokens')
+//            ->updateOrInsert(
+//                ['phone' => Auth::guard('reader')->user()['phone']],
+//                ['token' => Str::random(60)]
+//            );
+
         Auth::guard('reader')->logout();
 
         $request->session()->invalidate();
