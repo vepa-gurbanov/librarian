@@ -146,11 +146,11 @@
                             <span class="input-group-text" id="registerPhone">+993</span>
                             <input type="text" class="form-control form-control-sm" name="phone" id="register-phone" aria-describedby="registerPhone" placeholder="60000000" autocomplete="off" required>
                         </div>
-                        <div name="feedback"></div>
+                        <div class="mt-1" name="feedback"></div>
                     </div>
                     <div class="mb-3">
                         <button type="button" name="register" class="btn btn-sm btn-primary w-100">Get Verification code</button>
-{{--                        <button type="button" name="register" class="btn btn-sm btn-primary w-100" data-bs-target="#verifyModal" data-bs-toggle="modal">Get Verification code</button>--}}
+                        {{--                        <button type="button" name="register" class="btn btn-sm btn-primary w-100" data-bs-target="#verifyModal" data-bs-toggle="modal">Get Verification code</button>--}}
                     </div>
                     <p class="resend text-center text-muted mb-0">
                         Already registered? <a href="javascript:void(0);" onclick="$('[name=loginModal]').click()">Log In</a>
@@ -190,11 +190,11 @@
                             <span class="input-group-text" id="loginPhone">+993</span>
                             <input type="text" class="form-control form-control-sm" name="phone" id="login-phone" aria-describedby="loginPhone" placeholder="60000000" autocomplete="off" autofocus required>
                         </div>
-                        <div name="feedback"></div>
+                        <div class="mt-1" name="feedback"></div>
                     </div>
                     <div class="mb-3">
                         <button type="button" name="login" class="btn btn-sm btn-primary w-100">Get Verification code</button>
-{{--                        <button type="button" name="login" class="btn btn-sm btn-primary w-100" data-bs-target="#verifyModal" data-bs-toggle="modal">Get Verification code</button>--}}
+                        {{--                        <button type="button" name="login" class="btn btn-sm btn-primary w-100" data-bs-target="#verifyModal" data-bs-toggle="modal">Get Verification code</button>--}}
                     </div>
                     <p class="resend text-center text-muted mb-0">
                         Don't you have account? <a href="javascript:void(0);" onclick="$('[name=registerModal]').click()">Sign up</a>
@@ -227,18 +227,27 @@
                     <h4>Verify</h4>
                     <p>Your code was sent to "your phone"</p>
 
-                    <div class="otp-field mb-4">
-                        <input type="number" class="otp-input" />
-                        <input type="number" class="otp-input" disabled />
-                        <input type="number" class="otp-input" disabled />
-                        <input type="number" class="otp-input" disabled />
-                        <input type="number" class="otp-input" disabled />
-                        <button type="button" name="clearOtpInput" class="btn btn-outline-danger otp-input">×</button>
+                    <div class="mb-3">
+                        <label for="verify" class="form-label fw-semibold">Verification Code <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control form-control-sm" name="code" id="verify" placeholder="Enter code: 5 digits" autocomplete="off" autofocus required>
+                        <div class="mt-1" name="feedback"></div>
+                    </div>
+                    <div class="mb-3">
+                        <button type="button" name="verify" class="btn btn-sm btn-primary w-100">Get Verification code</button>
                     </div>
 
-                    <button type="button" name="verify" class="btn btn-primary mb-3">
-                        Verify
-                    </button>
+                    {{--                    <div class="otp-field mb-4">--}}
+                    {{--                        <input type="number" class="otp-input" />--}}
+                    {{--                        <input type="number" class="otp-input" disabled />--}}
+                    {{--                        <input type="number" class="otp-input" disabled />--}}
+                    {{--                        <input type="number" class="otp-input" disabled />--}}
+                    {{--                        <input type="number" class="otp-input" disabled />--}}
+                    {{--                        <button type="button" name="clearOtpInput" class="btn btn-outline-danger otp-input">×</button>--}}
+                    {{--                    </div>--}}
+
+                    {{--                    <button type="button" name="verify" class="btn btn-primary mb-3">--}}
+                    {{--                        Verify--}}
+                    {{--                    </button>--}}
 
                     <p class="resend text-muted mb-0">
                         Didn't receive code? <a href="">Request again</a>

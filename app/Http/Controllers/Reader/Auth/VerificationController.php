@@ -5,11 +5,13 @@ namespace App\Http\Controllers\Reader\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\Reader;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Validator;
 use function PHPUnit\Framework\isJson;
 
 class VerificationController extends Controller
@@ -27,36 +29,34 @@ class VerificationController extends Controller
     public function store(Request $request): JsonResponse
     {
 //        return response()->json(['status' => 'error', 'message' => [
-//            $request->name, $request->phone, $request->token, $request->code,
+//            'name' => $request->name, 'phone' => $request->phone, 'token' => $request->token, 'code' => $request->code,
 //        ]], 200);
-        try {
-            $request->validate([
-                'name' => ['sometimes', 'string'],
-                'phone' => ['required', 'integer', 'between:60000000,65999999'],
-                'token' => ['sometimes'],
-                'code' => ['required', 'integer', 'between:10000, 99999'],
-            ]);
+        $validation = \Illuminate\Support\Facades\Validator::make($request->all(), [
+            'name' => ['sometimes', 'string'],
+            'phone' => ['required', 'integer', 'between:60000000,65999999'],
+            'token' => ['sometimes'],
+            'code' => ['required', 'integer', 'between:10000, 99999'],
+        ]);
 
-        } catch (\Exception $exception) {
+        if ($validation->fails()) {
             return response()->json([
                 'status' => 'error',
-                'message' => $exception->getMessage(),
+                'message' =>  $validation->errors(),
             ], 400);
         }
 
         $name = $request->has('name');
         $verifiable = DB::table('password_reset_tokens')
-            ->where('phone', $request->phone)
-            ->where('code', $request->code)
-            ->when($request->has('token'), function ($q) use ($request) {
-                $q->where('token', $request->token);
-            })
+            ->where('phone', intval($request->phone))
+//            ->where('code', intval($request->code))
+            ->where('token', $request->token)
             ->first();
 
-        if (isset($verifiable) && $verifiable->code_expires_at < now()) {
+//return response()->json(['status' => 'error', 'message' => $verifiable->code_expires_at < now()->format('Y-m-d H:i:s')], 400);
+        if (isset($verifiable) && $verifiable->code_expires_at < Carbon::now()->toDateTimeString()) {
             return response()->json(['status' => 'error', 'message' => 'Verification code expired! Try resend.']);
 //            return back()->with('error', 'Verification code expired! Try resend.');
-        } elseif ($verifiable->code !== $request->code) {
+        } elseif (isset($verifiable) && $verifiable->code !== $request->code) {
             return response()->json(['status' => 'error', 'message' => 'Verification code incorrect! Try again.']);
 //            return back()->with('error', 'Verification code incorrect! Try again.');
         } elseif(isset($verifiable)) {
@@ -96,11 +96,10 @@ class VerificationController extends Controller
         }
     }
 
-    public function resend(Request $request): \Illuminate\Http\RedirectResponse
+    public function resend(Request $request): JsonResponse
     {
         {
             $validation = $request->validate([
-                'name' => ['nullable', 'string'],
                 'phone' => ['required', 'integer', 'between:60000000,65999999'],
             ]);
 
@@ -121,9 +120,15 @@ class VerificationController extends Controller
 //        } catch (\Exception $e) {
             // return back()
 //        }
+            return response()->json([
+                'token' => $token,
+                'key' => 'resend',
+                'status' => 'success',
+                'message' => trans('lang.verification-code-resend')
+            ], 200);
 
-            return to_route('verify', ['token' => $token])
-                ->with('status', 'Verification sent!');
+//            return to_route('verify', ['token' => $token])
+//                ->with('status', 'Verification sent!');
         }
     }
 }

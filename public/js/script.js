@@ -9,8 +9,6 @@ const errorIconClass = 'bi-exclamation-triangle-fill';
 const successIconClass = 'bi-check-circle-fill';
 function con(e) {console.log(e)}
 
-console.log(JSON.parse(localStorage.getItem('ddd'))['tel'])
-
 $(document).ready(function () {
     $('input, textarea').addClass('bordered');
     $.ajaxSetup({
@@ -351,11 +349,11 @@ function date() {
                     'return_date_input': $('input#' + a.attr('id') + '[name=return_date_input]').val(),
                     'price_per_day': $('span#price_per_day_' + a.attr('id')).text(),
                 },
-                success: function (response, textStatus, jqXHR) {
+                success: function (response) {
                     $('input#' + a.attr('id') + '[name=total_date_input]').val(response['total_days']);
                     $('span#total_price_' + a.attr('id')).text(response['price_per_day']);
                 },
-                error: function(jqXHR, textStatus, errorThrown){
+                error: function(jqXHR){
                     liveToast(jqXHR['responseJSON']['message'], 'bi-exclamation-triangle-fill', 'danger');
                 },
                 complete : function(){
@@ -378,11 +376,11 @@ function date() {
                 'receive_date_input': $('input#'+a.attr('id')+'[name=receive_date_input]').val(),
                 'price_per_day': $('span#price_per_day_' + a.attr('id')).text(),
             },
-            success: function (response, textStatus, jqXHR) {
+            success: function (response) {
                 $('input#' + a.attr('id') + '[name=return_date_input]').val(response['return_date'])
                 $('span#total_price_' + a.attr('id')).text(response['price_per_day']);
             },
-            error: function(jqXHR, textStatus, errorThrown){
+            error: function(jqXHR){
                 liveToast(jqXHR['responseJSON']['message'], 'bi-exclamation-triangle-fill', 'danger')
             },
             complete : function(){
@@ -399,7 +397,18 @@ function liveToast(response, icon, textStatus) {
     let toastClass = `bg-${textStatus}-subtle text-${textStatus}-emphasis`;
     toastBody.addClass(`toast-body rounded ${toastClass}`);
     toastBody.find('span#icon').addClass(icon);
-    toastBody.find('span#content').html(response);
+
+    let div = document.createElement('div')
+    if (typeof response === 'object') {
+        $.each(response, (k, m) => {
+            let li = document.createElement('li')
+            div.append(li.innerHTML = m)
+        })
+        toastBody.find('span#content').html(div);
+    } else {
+        toastBody.find('span#content').html(response);
+    }
+
     toastBootstrap.show()
 
    setTimeout(() => {
