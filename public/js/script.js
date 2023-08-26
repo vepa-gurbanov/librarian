@@ -9,6 +9,10 @@ const errorIconClass = 'bi-exclamation-triangle-fill';
 const successIconClass = 'bi-check-circle-fill';
 function con(e) {console.log(e)}
 
+// $.on('load', function () {
+//     $('body').blur().addClass('d-flex justify-content-center align-items-center').html(loadingImage)
+// })
+
 $(document).ready(function () {
     $('input, textarea').addClass('bordered');
     $.ajaxSetup({
@@ -115,7 +119,7 @@ function rate() {
             },
             error: function (response, error) {
                 if (response.statusText === 'Forbidden') {
-                    location.replace('http://127.0.0.1:8000/0auth1');
+                    location.replace('http://127.0.0.1:8000/oauth1');
                 }
                 console.log(response.statusText);
             }

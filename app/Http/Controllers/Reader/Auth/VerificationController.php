@@ -16,27 +16,14 @@ use Illuminate\Support\Facades\Validator;
 
 class VerificationController extends Controller
 {
-    public function create(Request $request): \Illuminate\Contracts\View\View|\Illuminate\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\Foundation\Application
-    {
-        $phone = DB::table('password_reset_tokens')
-            ->where('token', $request->token)
-            ->first()->phone;
-
-        return view('reader.auth.verification')
-            ->with(['request' => $request, 'phone' => $phone]);
-    }
-
     public function store(Request $request): JsonResponse
     {
-//        return response()->json(['status' => 'error', 'message' => [
-//            'name' => $request->name, 'phone' => $request->phone, 'token' => $request->token, 'code' => $request->code,
-//        ]], 200);
         $validation = Validator::make($request->all(), [
             'code' => ['required', 'integer', 'between:10000, 99999'],
         ]);
 
         if ($validation->fails()) {
-            return response()->json(['status' => 'error', 'message' =>  $validation->errors(),], 400);
+            return response()->json(['status' => 'error', 'message' =>  $validation->errors()], 400);
         }
 
         if (!Cookie::has('auth')) {
@@ -50,13 +37,10 @@ class VerificationController extends Controller
             ->where('token', $authData['token'])
             ->first();
 
-//return response()->json(['status' => 'error', 'message' => $verifiable->code_expires_at < now()->format('Y-m-d H:i:s')], 400);
         if (isset($verifiable) && $verifiable->code_expires_at < Carbon::now()->toDateTimeString()) {
             return response()->json(['status' => 'error', 'message' => 'Verification code expired! Try resend.']);
-//            return back()->with('error', 'Verification code expired! Try resend.');
-        } elseif (isset($verifiable) && $verifiable->code !== $authData['code']) {
+        } elseif (isset($verifiable) && $verifiable->code !== $request->code) {
             return response()->json(['status' => 'error', 'message' => 'Verification code incorrect! Try again.']);
-//            return back()->with('error', 'Verification code incorrect! Try again.');
         } elseif(isset($verifiable)) {
             if (isset($name)) {
                 $user = Reader::create([
@@ -68,12 +52,8 @@ class VerificationController extends Controller
                 try {
                     Auth::guard('reader')->login($user);
                     return response()->json(['status' => 'success', 'message' => 'Account successfully created!'], 201);
-//                    return to_route('home')
-//                        ->with('success', 'Account successfully created!');
                 } catch (\Exception $e) {
                     return response()->json(['status' => 'error', 'message' => $e->getMessage()], 400);
-//                    return back()
-//                        ->with('error', $e->getMessage());
                 }
             } else {
                 $user = Reader::where('phone', $authData['phone'])->first();
@@ -81,12 +61,8 @@ class VerificationController extends Controller
                 try {
                     Auth::guard('reader')->login($user);
                     return response()->json(['status' => 'success', 'message' => 'Logged in!'], 200);
-//                    return to_route('home')
-//                        ->with('success', 'Account logged in!');
                 } catch (\Exception $e) {
                     return response()->json(['status' => 'error', 'message' => $e->getMessage()], 400);
-//                    return back()
-//                        ->with('error', $e->getMessage());
                 }
             }
         } else {
@@ -126,8 +102,5 @@ class VerificationController extends Controller
             'status' => 'success',
             'message' => trans('lang.verification-code-resend')
         ], 200);
-
-//            return to_route('verify', ['token' => $token])
-//                ->with('status', 'Verification sent!');
     }
 }

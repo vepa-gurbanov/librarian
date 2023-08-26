@@ -18,8 +18,4 @@ $(document).ready(function () {
             }, false)
         })
     })()
-
-    $('[data-bs-toggle="tooltip"]').tooltip({
-        html: true
-    });
 })

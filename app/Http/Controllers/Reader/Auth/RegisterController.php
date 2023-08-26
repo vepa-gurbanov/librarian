@@ -16,11 +16,6 @@ use Illuminate\Validation\Rules;
 
 class RegisterController extends Controller
 {
-    public function create(): \Illuminate\Contracts\View\View|\Illuminate\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\Foundation\Application
-    {
-        return view('reader.auth.register');
-    }
-
     public function store(Request $request): \Illuminate\Http\JsonResponse
     {
         try {
@@ -35,7 +30,6 @@ class RegisterController extends Controller
 
             if (Reader::where('phone', $request->phone)->exists()) {
                 return response()->json(['status' => 'error', 'message' => trans('lang.account_exists_try_login')], 400);
-//                return back()->with('error', 'Account exist!');
             }
 
             $token = Str::random(60);
@@ -63,8 +57,6 @@ class RegisterController extends Controller
                 'message' => trans('lang.verification-sent') . 'The code is: ' . $code . '. This is just demo'
             ], 201);
 
-//            return to_route('verify', ['token' => $token . '?name=' . $request->name])
-//                ->with('status', 'Verification sent!');
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => $e->getMessage()], 400);
         }

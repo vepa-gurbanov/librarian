@@ -22,7 +22,3 @@
 .otp-field input::-webkit-outer-spin-button {
     display: none;
 }
-
-.resend {
-    font-size: 12px;
-}

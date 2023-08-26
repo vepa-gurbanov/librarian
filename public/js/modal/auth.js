@@ -2,8 +2,9 @@ const loginButton = $('button[name=login]');
 const registerButton = $('button[name=register]');
 const verifyButton = $('button[name=verify]');
 const resendButton = $('a#resend');
+const pTextForVerification = $('p#verifyHelpText');
 
-fetchAuth().then((res) => countdownTimer(res))
+fetchAuth()
 login()
 register()
 verify()
@@ -113,13 +114,10 @@ function verify() {
             // contentType: 'application/json',
             // dataType: 'json',
             success: function (response) {
+                location.reload();
                 if (response['status'] === 'success') {
                     form.html(loadingSuccessXXL).fadeIn();
-                    setTimeout(function () {
-                        $('.modal').fadeOut().after(function () {
-                            location.reload();
-                        });
-                    }, 2000);
+                    $('.modal').fadeOut()
                     liveToast(response['message'], successIconClass, 'success')
                 } else {
                     showFeedback(response['message'], "danger", form)
@@ -149,12 +147,13 @@ function resend() {
         t.append(loadingImageSM);
 
         $.ajax({
-            url: '0auth2r',
+            url: 'oauth2r',
             method: 'POST',
             processData: true,
             dataType: 'json',
             success: function (response) {
                 fetchAuth()
+                t.find('img').remove();
                 liveToast(response['message'], successIconClass, 'success')
             },
             error: function(jqXHR) {
@@ -182,30 +181,41 @@ function showFeedback(message, type, form) {
 }
 
 
-async function fetchAuth() {
-    let result;
-    result = $.ajax({
-        url: '/0auth-fetch',
+function fetchAuth() {
+    $.ajax({
+        url: '/oauth-fetch',
         method: 'GET',
         contentType: "application/json",
         dataType: 'json',
         processData: true,
+        success: function (res) {
+            $.each(res, (k,v) => {
+                console.log('fetch response => '+k+': '+v)
+            })
+
+            if (res['expired'] === 0) {
+                countdownTimer(res)
+                // pTextForVerification.html('Your code was sent to <b>+993 ' + res['phone']+'</b><br>Expires in <span id="countdownTimer"></span>')
+            } else {
+                pTextForVerification.html(
+                    '<a href="javascript:void(0);" data-bs-target="#registerModal" data-bs-toggle="modal">Sign up</a> or '+
+                    '<a href="javascript:void(0);" data-bs-target="#loginModal" data-bs-toggle="modal">Log in</a> to request code.'
+                )
+            }
+
+        }
     })
-    return result;
 }
 
 
 function countdownTimer(res) {
+    if (!res['expired']) {
 
-    $.each(res, (k,v) => {
-        console.log('fetch response => '+k+': '+v)
-    })
+        const phone = res['phone'];
+        const expiry = res['expiry'];
 
-    const phone = res['phone'];
-    const expiry = res['expiry'];
+        pTextForVerification.html('Your code was sent to <b>+993 ' + phone +'</b><br>Expires in <span></span>');
 
-    if (res['expired'] === 0) {
-        // $('p#verifyHelpText').html('Your code was sent to <b>+993 ' + res['phone']+'</b><br>Expires in <span id="countdownTimer"></span>')
         var countDownDate = new Date(expiry).getTime();
         var x = setInterval(function() {
 
@@ -219,25 +229,24 @@ function countdownTimer(res) {
             var distance = countDownDate - now;
 
             // Time calculations for days, hours, minutes and seconds
-            var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            let seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
             // Display the result in the element with id="demo"
-            return  $('p#verifyHelpText').html('Your code was sent to <b>+993 ' + phone +'</b><br>Expires in '+ minutes + ':' + seconds + ' seconds');
+            pTextForVerification.find('span').text(minutes + ':' + seconds + ' seconds')
             // document.getElementById("countdownTimer").innerHTML = minutes + ":" + seconds + " seconds";
 
             // If the count down is finished, write some text
             if (distance < 0) {
                 clearInterval(x);
-                return  $('p#verifyHelpText').html(
+                pTextForVerification.html(
                     '<a href="javascript:void(0);" data-bs-target="#registerModal" data-bs-toggle="modal">Sign up</a> or '+
                     '<a href="javascript:void(0);" data-bs-target="#loginModal" data-bs-toggle="modal">Log in</a> to request code.'
                 )
             }
         }, 1000);
-
     } else {
-        $('p#verifyHelpText').html(
+        pTextForVerification.html(
             '<a href="javascript:void(0);" data-bs-target="#registerModal" data-bs-toggle="modal">Sign up</a> or '+
             '<a href="javascript:void(0);" data-bs-target="#loginModal" data-bs-toggle="modal">Log in</a> to request code.'
         )
