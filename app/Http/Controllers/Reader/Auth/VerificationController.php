@@ -9,10 +9,10 @@ use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Validator;
-use function PHPUnit\Framework\isJson;
+use Illuminate\Support\Facades\Validator;
 
 class VerificationController extends Controller
 {
@@ -31,39 +31,37 @@ class VerificationController extends Controller
 //        return response()->json(['status' => 'error', 'message' => [
 //            'name' => $request->name, 'phone' => $request->phone, 'token' => $request->token, 'code' => $request->code,
 //        ]], 200);
-        $validation = \Illuminate\Support\Facades\Validator::make($request->all(), [
-            'name' => ['sometimes', 'string'],
-            'phone' => ['required', 'integer', 'between:60000000,65999999'],
-            'token' => ['sometimes'],
+        $validation = Validator::make($request->all(), [
             'code' => ['required', 'integer', 'between:10000, 99999'],
         ]);
 
         if ($validation->fails()) {
-            return response()->json([
-                'status' => 'error',
-                'message' =>  $validation->errors(),
-            ], 400);
+            return response()->json(['status' => 'error', 'message' =>  $validation->errors(),], 400);
         }
 
-        $name = $request->has('name');
+        if (!Cookie::has('auth')) {
+            return response()->json(['status' => 'error', 'message' => trans('lang.try-request-code-again')]);
+        }
+        $authData = json_decode(Cookie::get('auth'), true);
+
+        $name = $authData['name'];
         $verifiable = DB::table('password_reset_tokens')
-            ->where('phone', intval($request->phone))
-//            ->where('code', intval($request->code))
-            ->where('token', $request->token)
+            ->where('phone', $authData['phone'])
+            ->where('token', $authData['token'])
             ->first();
 
 //return response()->json(['status' => 'error', 'message' => $verifiable->code_expires_at < now()->format('Y-m-d H:i:s')], 400);
         if (isset($verifiable) && $verifiable->code_expires_at < Carbon::now()->toDateTimeString()) {
             return response()->json(['status' => 'error', 'message' => 'Verification code expired! Try resend.']);
 //            return back()->with('error', 'Verification code expired! Try resend.');
-        } elseif (isset($verifiable) && $verifiable->code !== $request->code) {
+        } elseif (isset($verifiable) && $verifiable->code !== $authData['code']) {
             return response()->json(['status' => 'error', 'message' => 'Verification code incorrect! Try again.']);
 //            return back()->with('error', 'Verification code incorrect! Try again.');
         } elseif(isset($verifiable)) {
-            if ($name) {
+            if (isset($name)) {
                 $user = Reader::create([
-                    'name' => $request->name,
-                    'phone' => $request->phone,
+                    'name' => $authData['name'],
+                    'phone' => $authData['phone'],
                     'password' => $request->code
                 ]);
 
@@ -78,7 +76,7 @@ class VerificationController extends Controller
 //                        ->with('error', $e->getMessage());
                 }
             } else {
-                $user = Reader::where('phone', $request->phone)->first();
+                $user = Reader::where('phone', $authData['phone'])->first();
                 $user->update(['password' => $request->code]);
                 try {
                     Auth::guard('reader')->login($user);
@@ -96,39 +94,40 @@ class VerificationController extends Controller
         }
     }
 
-    public function resend(Request $request): JsonResponse
+    public function resend(): JsonResponse
     {
-        {
-            $validation = $request->validate([
-                'phone' => ['required', 'integer', 'between:60000000,65999999'],
-            ]);
+        if (!Cookie::has('auth')) {
+            return response()->json(['status' => 'error', 'message' => trans('lang.try-request-code-again')]);
+        }
 
-            $token = Str::random(60);
-            $code = mt_rand(10000, 99999);
-            DB::table('password_reset_tokens')
-                ->updateOrInsert(
-                    ['phone' => $validation['phone']],
-                    [
-                        'token' => $token,
-                        'code' => $code,
-                        'code_expires_at' => now()->addMinutes(10),
-                    ]
-                );
+        $authData = json_decode(Cookie::get('auth'), true);
+        $token = Str::random(60);
+        $code = mt_rand(10000, 99999);
+        $expiresAt = now()->addMinutes(10);
+        DB::table('password_reset_tokens')
+            ->updateOrInsert(
+                ['phone' => $authData['phone']],
+                [
+                    'token' => $token,
+                    'code' => $code,
+                    'code_expires_at' => $expiresAt,
+                ]
+            );
+
+        set_auth_data_before_fetch(phone: $authData['phone'], token: $token, expiresAt: $expiresAt, name: $authData['name']);
 
 //        try {
-            // Here:send $code to $validation['phone']
+        // Here:send $code to $validation['phone']
 //        } catch (\Exception $e) {
-            // return back()
+        // return back()
 //        }
-            return response()->json([
-                'token' => $token,
-                'key' => 'resend',
-                'status' => 'success',
-                'message' => trans('lang.verification-code-resend')
-            ], 200);
+        return response()->json([
+            'key' => 'resend',
+            'status' => 'success',
+            'message' => trans('lang.verification-code-resend')
+        ], 200);
 
 //            return to_route('verify', ['token' => $token])
 //                ->with('status', 'Verification sent!');
-        }
     }
 }

@@ -9,6 +9,7 @@ use App\Models\Category;
 use App\Models\Option;
 use App\Models\Shelf;
 use Barryvdh\Debugbar\Facades\Debugbar;
+use Carbon\Carbon;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
@@ -19,7 +20,14 @@ class HomeController extends Controller
 {
     public function index(Request $request)
     {
-//        $inCart = Cookie::has('cart') ? in_array(200, collect(json_decode(Cookie::get('cart'), true))->where('option', 'r')->pluck('id')->toArray()) : [];
+        $authCreds = json_decode(Cookie::get('auth'), true);
+        $exists = DB::table('password_reset_tokens')->where('phone', $authCreds['phone'])
+            ->where('token', $authCreds['token'])->exists();
+
+        return $authCreds;
+        return strval(Carbon::parse($authCreds['expires_at'])->diffAsCarbonInterval(Carbon::now()));
+
+        //        $inCart = Cookie::has('cart') ? in_array(200, collect(json_decode(Cookie::get('cart'), true))->where('option', 'r')->pluck('id')->toArray()) : [];
 //return $inCart;
         $top = Book::query()
             ->orderBy('liked', 'desc')

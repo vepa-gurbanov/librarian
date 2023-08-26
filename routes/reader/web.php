@@ -23,11 +23,12 @@ use Spatie\Honeypot\ProtectAgainstSpam;
 |
 */
 
+Route::get('/0auth-fetch', [LoginController::class, 'fetch'])->name('fetch');
 Route::get('/0auth', [RegisterController::class, 'create'])->name('register');
 Route::post('/0auth', [RegisterController::class, 'store']);
 Route::get('/0auth1', [LoginController::class, 'create'])->name('login');
 Route::post('/0auth1', [LoginController::class, 'store']);
-Route::post('/0auth2r/{token}', [VerificationController::class, 'resend'])->name('resend');
+Route::post('/0auth2r', [VerificationController::class, 'resend'])->name('resend');
 Route::get('/0auth2', [VerificationController::class, 'create'])->name('verify');
 Route::post('/0auth2', [VerificationController::class, 'store']);
 Route::post('/0auth1/logout', [LoginController::class, 'destroy'])->name('logout')->middleware('auth:reader');

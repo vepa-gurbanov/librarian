@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Reader\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\Reader;
-use http\Client\Response;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -36,16 +36,19 @@ class LoginController extends Controller
 
         $token = Str::random(60);
         $code = mt_rand(10000, 99999);
+        $expiresAt = Carbon::now()->addMinutes(10);
         DB::table('password_reset_tokens')
             ->updateOrInsert(
                 ['phone' => $validation['phone']],
                 [
                     'token' => $token,
                     'code' => $code,
-                    'code_expires_at' => now()->addMinutes(10),
+                    'code_expires_at' => $expiresAt,
                 ]
             );
 
+        set_auth_data_before_fetch(phone: $request->phone, token: $token, expiresAt: $expiresAt);
+//        $this->authData(phone: $request->phone, token: $token, expiresAt: $expiresAt);
 //        try {
         // Here:send $code to $validation['phone']
 //        } catch (\Exception $e) {
@@ -78,5 +81,39 @@ class LoginController extends Controller
         $request->session()->regenerateToken();
 
         return redirect('/');
+    }
+
+//    public function authData($phone, $token, $expiresAt, $name = null) {
+//        $data = [
+//            'name' => $name,
+//            'phone' => $phone,
+//            'token' => $token,
+//            'expires_at' => $expiresAt,
+//        ];
+//        Cookie::queue('auth', json_encode($data), 10);
+//        return true;
+//    }
+
+
+    public function fetch(Request $request): JsonResponse
+    {
+        if (!Cookie::has('auth')) {
+            return response()->json(['status' => 'error', 'message' => trans('lang.try-request-code-again')]);
+        }
+
+        $authCreds = json_decode(Cookie::get('auth'), true);
+        $exists = DB::table('password_reset_tokens')->where('phone', $authCreds['phone'])
+            ->where('token', $authCreds['token'])->exists();
+
+        if ($exists && Cookie::has('auth') && Carbon::parse($authCreds['expires_at'])->lte(Carbon::now()->toDateTimeString())) {
+            return response()->json([
+                'expired' => 0,
+                'expiry' => Carbon::parse($authCreds['expires_at'])->addHours(5)->format('M d, Y H:i:s'),
+//                'expires_at' => strval(Carbon::parse($authCreds['expires_at'])->diffAsCarbonInterval(Carbon::now())),
+                'phone' => $authCreds['phone']
+            ]);
+        } else {
+            return response()->json(['expired' => 1]);
+        }
     }
 }
