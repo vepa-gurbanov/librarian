@@ -3,7 +3,7 @@ const registerButton = $('button[name=register]');
 const verifyButton = $('button[name=verify]');
 const resendButton = $('a#resend');
 
-fetchAuth().then(res => countdownTimer(res))
+fetchAuth().then((res) => countdownTimer(res))
 login()
 register()
 verify()
@@ -184,22 +184,16 @@ function showFeedback(message, type, form) {
 
 async function fetchAuth() {
     let result;
-
-    try {
-        result = $.ajax({
-            url: '/0auth-fetch',
-            method: 'GET',
-            contentType: "application/json",
-            dataType: 'json',
-            processData: true,
-        })
-        return result;
-    } catch (e) {
-        console.error(e)
-    }
+    result = $.ajax({
+        url: '/0auth-fetch',
+        method: 'GET',
+        contentType: "application/json",
+        dataType: 'json',
+        processData: true,
+    })
+    return result;
 }
 
-fetchAuth().then((res) => countdownTimer(res))
 
 function countdownTimer(res) {
 
