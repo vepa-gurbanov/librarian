@@ -22,7 +22,7 @@ class Category extends Model
 
     public $translatable = ['name'];
 
-    protected $touches = ['books'];
+//    protected $touches = ['books'];
 
 
     protected static function booted()

@@ -243,13 +243,13 @@ function addToCart() {
 addToCart();
 
 
-// function hideAlertToast() {
-//     if ($(document).has('.toast')) {
-//         setTimeout(function () {
-//             $('.toast').fadeOut();
-//         }, 3000)
-//     }
-// }
+function hideAlertToast() {
+    if ($(document).has('.toast')) {
+        setTimeout(function () {
+            $('.toast').fadeOut();
+        }, 3000)
+    }
+}
 
 
 function liveSearch() {
@@ -415,7 +415,7 @@ function liveToast(response, icon, textStatus) {
 
     toastBootstrap.show()
 
-   setTimeout(() => {
+    setTimeout(() => {
         toastBody.removeClass(toastClass)
         toastBootstrap.hide()
     }, 3000)
@@ -478,3 +478,40 @@ function liveToast(response, icon, textStatus) {
 //     console.log("First day=" + firstDay)
 //     console.log("Last day = " + lastDay);
 // }
+
+const fetchLocations = async (url) => {
+    try {
+        const data = await fetch(url);
+        return await data.json();
+    } catch (e) {
+        console.error('error: '+e)
+    }
+}
+
+async function Locations() {
+    const locations = await fetchLocations('http://127.0.0.1:8000/fetch-locations');
+    for (const location of locations['data']) {
+        // for (const locationElement of location) {
+        console.log(`${location.name.tm}`)
+        if (location.child) {
+            for (const locationElement of location.child) {
+                console.log(`   ${locationElement.name.tm}`)
+            }
+        }
+        // }
+    }
+}
+
+Locations();
+// fetchLocations('http://127.0.0.1:8000/fetch-locations').then((data), (data) => {
+//
+// });
+//     async function fetchLocations(url) {
+//         const locations = await $.ajax(url);
+//
+//         $.each(locations['data'], function (k) {
+//             console.log(k)
+//             // select.append(`<option>${k['name']}</option>`)
+//         })
+//     }
+// fetchLocations('http://127.0.0.1:8000/fetch-locations');

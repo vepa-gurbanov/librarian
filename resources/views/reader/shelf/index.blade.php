@@ -11,5 +11,6 @@
                 </div>
             @endforeach
         </div>
+{{--        <div class="mb-3">{{ $shelves->links() }}</div>--}}
     </main>
 @endsection

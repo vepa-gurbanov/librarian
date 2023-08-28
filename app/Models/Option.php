@@ -20,7 +20,7 @@ class Option extends Model
         'audiobook' => ['mp3']
     ];
 
-    protected $touches = ['book'];
+//    protected $touches = ['books'];
 
 
     public function book(): BelongsTo

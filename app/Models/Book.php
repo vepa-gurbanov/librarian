@@ -242,7 +242,7 @@ class Book extends Model
 
      public function price(): float
     {
-        return $this->discount_percent
+        return $this->isDiscount()
             ? $this->discountPrice()
             : $this->price;
     }

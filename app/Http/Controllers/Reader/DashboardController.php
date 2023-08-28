@@ -20,9 +20,10 @@ class DashboardController extends Controller
     {
         $reader = auth('reader')->user();
         $cart = collect($this->getCookie());
+//        return $cart;
         $inCartBooks = [];
         foreach ($cart as $item) {
-            $inCartBooks[] = Book::query()->where('id', $item['id'])
+            $books = Book::query()->where('id', $item['id'])
                 ->when($item['option'] === 'b', function ($q) {
                     $q->with('options');
                 })->when($item['option'] === 'a', function ($q) {
@@ -37,7 +38,22 @@ class DashboardController extends Controller
                 ->with('reader')
                 ->get(['id', 'reader_id', 'full_name', 'slug', 'book_code', 'image', 'page', 'price', 'value', 'condition', 'created_at'])
                 ->add(['option' => $item['option'], 'price' => $item['price']]);
+
+            $inCartBooks[] = $books;
+
+            $toCookie[] = [
+                'id'  => $books[0]->id,
+                'full_name' => $books[0]->full_name,
+                'total_days' => null,
+                'return_date' => null,
+                'price' => $books[1]['price'],
+                'thumbnail' => $books[0]->image(),
+                'option' => $books[1]['option'],
+            ];
         }
+
+        Cookie::queue('checkout', json_encode($toCookie, JSON_UNESCAPED_UNICODE), 31 * 24 * 60);
+
         $registeredBooks = collect([]);
         if (auth('reader')->check()) {
             $registeredBooks = Book::query()

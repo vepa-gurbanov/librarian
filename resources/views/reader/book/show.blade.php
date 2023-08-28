@@ -188,7 +188,7 @@
                             </div>
                             <div class="mb-3">
 
-                                @if(in_array(array_search('b', config('settings.purchase')), $inCart))
+                                @if(in_array('b', $inCart))
                                     <a href="{{ route('dashboard') }}" class="btn btn-outline-primary m-1" data-bs-toggle="tooltip"
                                        data-bs-placement="top" data-bs-custom-class="custom-tooltip" title="<i class='bi-cart-check'></i> Go to Cart">
                                         <span class="bi-gift-fill text-danger"></span>
@@ -197,7 +197,7 @@
                                     </a>
                                 @else
                                     <a href="{{ route('cart', ['id' => $book->id, 'option' => 'b']) }}" class="btn btn-outline-primary m-1" data-bs-toggle="tooltip"
-                                       data-bs-placement="top" data-bs-custom-class="custom-tooltip" title="<i class='bi-cart-check'></i> Go to Cart">
+                                       data-bs-placement="top" data-bs-custom-class="custom-tooltip" title="<i class='bi-cart-plus'></i> Add to Cart">
                                         <span class="bi-gift-fill text-danger"></span>
                                         <span class="text-danger">@lang('lang.bundle'):</span> {{ $book->options->sum('price') + $book->price() }}
                                         <span class="small-sm">TMT</span>

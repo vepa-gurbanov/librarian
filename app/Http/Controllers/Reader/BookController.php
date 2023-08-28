@@ -36,8 +36,8 @@ class BookController extends Controller
             'v' => ['nullable', 'array'], // values => v
             'v.*' => ['nullable', 'array'], // values[] => v.*
             'v.*.*' => ['nullable', 'integer', 'min:1', 'distinct'], // values[][] => v.*.*
-
-
+            'eb' => ['sometimes', 'boolean'],
+            'ab' => ['sometimes', 'boolean'],
         ]);
 
         $q = $request->has('q') ? $validation['q'] : null;
@@ -54,19 +54,30 @@ class BookController extends Controller
         ];
         $order = isset($f_order) ?  $orderConfig[$f_order] : null;
 
-        $books = Book::when($q, function ($query) use ($q) {
-            $query->where('name', 'like', '%' . $q . '%');
-            $query->orWhere('full_name', 'like', '%' . $q . '%');
-            $query->orWhere('slug', 'like', '%' . $q . '%');
-            $query->orWhere('barcode', 'like', '%' . $q . '%');
-            $query->orWhere('book_code', 'like', '%' . $q . '%');
-        })->when(($f_min_price or $f_max_price), function ($query) use ($price) {
-            $query->whereBetween('price', [$price['min'], $price['max']]);
-        })
+        $books = Book::query()
+            ->when(isset($request->eb), function ($query) {
+                $query->whereHas('options', function ($query) {
+                    $query->where('type', 'electron');
+                });
+            })
+            ->when(isset($request->ab), function ($query) {
+                $query->whereHas('options', function ($query) {
+                    $query->where('type', 'audiobook');
+                });
+            })
+            ->when($q, function ($query) use ($q) {
+                $query->where('name', 'like', '%' . $q . '%');
+                $query->orWhere('full_name', 'like', '%' . $q . '%');
+                $query->orWhere('slug', 'like', '%' . $q . '%');
+                $query->orWhere('barcode', 'like', '%' . $q . '%');
+                $query->orWhere('book_code', 'like', '%' . $q . '%');
+            })->when(($f_min_price or $f_max_price), function ($query) use ($price) {
+                $query->whereBetween('price', [$price['min'], $price['max']]);
+            })
             ->when($order, function ($query, $order) {
                 return $query->orderBy($order[0], $order[1]);
             }, function ($query) {
-                return $query->orderByDesc('id');
+                return $query->inRandomOrder();
             })
             ->when($f_publishers, function ($query, $f_publishers) {
                 return $query->where(function ($query1) use ($f_publishers) {
@@ -106,7 +117,7 @@ class BookController extends Controller
             })
             ->orderByDesc('id')
             ->with('categories:id,slug,name')
-            ->paginate(10, ['id', 'name', 'slug', 'price', 'page', 'liked', 'image'])
+            ->paginate(8, ['id', 'name', 'slug', 'price', 'page', 'liked', 'image'])
             ->appends($request->query());
 
         $maxPrice = Book::orderByDesc('price')->first()->price;
@@ -128,6 +139,8 @@ class BookController extends Controller
 
         $data = [
             'q' => $q,
+            'eb' => $request->has('eb'),
+            'ab' => $request->has('ab'),
             'f_min_price' => $f_min_price,
             'f_max_price' => $f_max_price,
             'f_order' => $f_order,
@@ -166,7 +179,7 @@ class BookController extends Controller
 
         $cart = collect(Cookie::has('cart') ? json_decode(Cookie::get('cart'), true) : []);
         $inCart = $cart->where('id', $book->id)->pluck('option')->toArray();
-
+//        return $inCart;
         $data = [
             'similars' => $similars,
             'liked' => in_array($book->id, $this->getCookie('likedBooks')) ? 'text-danger' : 'text-dark',

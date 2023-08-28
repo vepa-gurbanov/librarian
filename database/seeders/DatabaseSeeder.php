@@ -43,6 +43,7 @@ class DatabaseSeeder extends Seeder
     public function registrationFactory(): array
     {
         return [
+            LocationSeeder::class,
             \App\Models\Registration::factory(250)->create(),
         ];
     }
@@ -56,6 +57,7 @@ class DatabaseSeeder extends Seeder
         $this->bookFactory();
         $this->registrationFactory();
 
+        // Defines Algolia search is searchable and enables syncing
         Book::all()->searchable();
         Book::enableSearchSyncing();
 

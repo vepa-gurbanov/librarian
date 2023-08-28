@@ -7,6 +7,7 @@ use App\Http\Controllers\Reader\Auth\VerificationController;
 use App\Http\Controllers\Reader\BookController;
 use App\Http\Controllers\Reader\DashboardController;
 use App\Http\Controllers\Reader\HomeController;
+use App\Http\Controllers\Reader\LocationController;
 use App\Http\Controllers\Reader\ShelfController;
 use App\Models\Book;
 use Illuminate\Support\Facades\Route;
@@ -52,6 +53,8 @@ Route::resource('shelves', ShelfController::class);
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 Route::get('cart', [DashboardController::class, 'cart'])->name('cart');
 Route::get('date', [DashboardController::class, 'dateControl'])->name('date');
+
+Route::get('fetch-locations', [LocationController::class, 'fetchAll'])->name('locations.all');
 
 
 

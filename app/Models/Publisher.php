@@ -15,7 +15,7 @@ class Publisher extends Model
 
     public $timestamps = false;
 
-    protected $touches = ['books'];
+//    protected $touches = ['books'];
 
 
     public function books()

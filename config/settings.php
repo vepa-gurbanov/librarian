@@ -8,8 +8,8 @@ return [
     ]
     ,
     'ordering' => [
-        'nameAsc' => ['name', 'asc'],
-        'nameDesc' => ['name', 'desc'],
+        'nameAsc' => ['slug', 'asc'],
+        'nameDesc' => ['slug', 'desc'],
         'priceLow' => ['price', 'asc'],
         'priceHigh' => ['price', 'desc'],
         'newest' => ['id', 'desc'],

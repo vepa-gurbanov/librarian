@@ -1,4 +1,21 @@
 <form action="{{ route('books.index') }}" method="GET" id="bookFilter">
+    <div class="mb-3 gap-3 d-flex justify-content-between">
+        <button type="submit" class="btn btn-sm w-100 btn-primary bi-filter">Filter</button>
+        <a href="{{ route('books.index') }}" class="btn btn-sm w-100 btn-outline-danger bi-x">Clear</a>
+    </div>
+    <div class="mb-3">
+        <input type="text" class="form-control form-control-sm" name="q" value="{{ $q }}" placeholder="[name, author, published year, ISBN]">
+    </div>
+    <div class="mb-3">
+        <select class="form-select form-select-sm" name="ordering" id="ordering" size="1" onchange="$('form#bookFilter').submit();">
+            <option value>@lang('lang.ordering'): @lang('lang.default')</option>
+            @foreach(array_keys(config()->get('settings.ordering')) as $ordering)
+                <option value="{{ $ordering }}" {{ $ordering == $f_order ? 'selected' : '' }}>
+                    @lang('lang.' . $ordering)
+                </option>
+            @endforeach
+        </select>
+    </div>
 
     <!-- Start filter scroll -->
     <div class="scrollbar px-2" id="scrollbar">
@@ -19,13 +36,31 @@
             </div>
         </div> <!-- End filter/price scroll -->
 
+        <!-- Start filter/option scroll -->
+        <div class="bg-white border rounded p-2 mb-3">
+            <div class="d-flex justify-content-between cursor-pointer" data-bs-toggle="collapse" data-bs-target="#collapseOption" aria-expanded="false" aria-controls="collapseOption">
+                <span class="small"><b>Options</b></span>
+                <span class="bi-caret-down-fill"></span>
+            </div>
+            <div class="collapse show" id="collapseOption">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" name="eb" id="electron" value="1" {{ $eb ? 'checked' : '' }}>
+                    <label class="form-check-label" for="electron">Electron: pdf, epub</label>
+                </div>
+                <div class="form-check form-switch small">
+                    <input class="form-check-input" type="checkbox" role="switch" name="ab" id="audiobook" value="1" {{ $ab ? 'checked' : '' }}>
+                    <label class="form-check-label" for="audiobook">Audiobook: mp3</label>
+                </div>
+            </div>
+        </div> <!-- End filter/option scroll -->
+
         <!-- Start filter/Category scroll -->
         <div class="bg-white border rounded p-2 mb-3">
             <div class="d-flex justify-content-between cursor-pointer" data-bs-toggle="collapse" data-bs-target="#collapseCategory" aria-expanded="false" aria-controls="collapseCategory">
                 <span class="small"><b>Categories</b></span>
                 <span class="bi-caret-down-fill"></span>
             </div>
-            <div class="collapse show" id="collapseCategory">
+            <div class="collapse" id="collapseCategory">
                 <div class="mt-2">
                     <input type="text" class="form-control form-control-sm bg-light-subtle bordered" id="search_category" placeholder="..." value="{{ old('search_category') }}">
                 </div>
@@ -48,7 +83,7 @@
                 <span class="small"><b>Authors</b></span>
                 <span class="bi-caret-down-fill"></span>
             </div>
-            <div class="collapse show" id="collapseAuthor">
+            <div class="collapse" id="collapseAuthor">
                 <div class="mt-2">
                     <input type="text" class="form-control form-control-sm bg-light-subtle bordered" id="search_author" placeholder="..." value="{{ old('search_author') }}">
                 </div>
@@ -71,7 +106,7 @@
                 <span class="small"><b>Publishers</b></span>
                 <span class="bi-caret-down-fill"></span>
             </div>
-            <div class="collapse show" id="collapsePublisher">
+            <div class="collapse" id="collapsePublisher">
                 <div class="mt-2">
                     <input type="text" class="form-control form-control-sm bg-light-subtle bordered" id="search_publisher" placeholder="..." value="{{ old('search_publisher') }}">
                 </div>
@@ -87,9 +122,6 @@
                 </div>
             </div>
         </div> <!-- End filter/Publisher scroll -->
-
-        <button type="submit" class="btn btn-primary bi-filter">Filter</button>
-        <a href="{{ route('books.index') }}" class="btn btn-outline-danger bi-x">Clear</a>
 
     </div> <!-- End filter scroll -->
 </form>

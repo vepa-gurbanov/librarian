@@ -10,7 +10,7 @@
                     @include('reader.app.book')
                 </div>
             @endforeach
-            <div class="mb-3">{{ $books->links() }}</div>
         </div>
+        <div class="mb-3">{{ $books->links() }}</div>
     </main>
 @endsection
