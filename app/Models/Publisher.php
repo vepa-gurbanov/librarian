@@ -9,7 +9,8 @@ use Laravel\Scout\Searchable;
 
 class Publisher extends Model
 {
-    use HasFactory, Searchable;
+    use HasFactory;
+//    use Searchable;
 
     protected $guarded = ['id'];
 

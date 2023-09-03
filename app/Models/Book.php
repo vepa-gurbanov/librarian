@@ -17,7 +17,8 @@ use Spatie\Translatable\HasTranslations;
 
 class Book extends Model
 {
-    use HasFactory, HasTranslations, Searchable;
+    use HasFactory, HasTranslations;
+//    use Searchable;
 
     public $translatable = ['name', 'full_name', 'body', 'description'];
 
@@ -264,22 +265,22 @@ class Book extends Model
     }
 
 
-    public function toSearchableArray()
-    {
-        $array = $this->toArray();
-
-        $array = $this->transform($array);
-
-        $array['options'] = $this->options->pluck('type', 'format')->toArray();
-
-        $array['categories'] = $this->categories->map(function ($data) {
-            return $data['name'];
-        })->toArray();
-
-        $array['publishers'] = $this->publishers->map(function ($data) {
-            return $data['name'];
-        })->toArray();
-
-        return $array;
-    }
+//    public function toSearchableArray()
+//    {
+//        $array = $this->toArray();
+//
+//        $array = $this->transform($array);
+//
+//        $array['options'] = $this->options->pluck('type', 'format')->toArray();
+//
+//        $array['categories'] = $this->categories->map(function ($data) {
+//            return $data['name'];
+//        })->toArray();
+//
+//        $array['publishers'] = $this->publishers->map(function ($data) {
+//            return $data['name'];
+//        })->toArray();
+//
+//        return $array;
+//    }
 }

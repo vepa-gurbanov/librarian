@@ -1,7 +1,12 @@
-<div class="border rounded p-2">
+<div class="border rounded p-2 position-relative">
     <a href="{{ route('books.show', $book->slug) }}">
         <img src="{{ $book->image() }}" alt="{{ $book->name }}" class="img-fluid">
     </a>
+    @if(in_array('electron', $book->options->pluck('type')->toArray()))
+        <span class="position-absolute bottom-0 end-0 mb-3 me-3">
+            <a href="#" class="btn btn-sm btn-bd-primary small bi-filetype-pdf"></a>
+        </span>
+    @endif
 </div>
 <div class="small">
     <div class="fw-bolder">

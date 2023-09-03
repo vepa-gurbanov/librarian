@@ -515,3 +515,24 @@ Locations();
 //         })
 //     }
 // fetchLocations('http://127.0.0.1:8000/fetch-locations');
+
+
+$('button#checkout').on('click', function (e) {
+    let arr = [];
+    e.preventDefault();
+    let content = $(this).parent().find('tr');
+    $.each(content, function (i) {
+        let option = $(this).find('input:hidden[name=book_option]').val();
+        let id = $(this).find('input:hidden[name=id]').val();
+        arr.push({
+            'id': id,
+            'option': option,
+            'title': $(this).find('span#title').text(),
+            'total_price': $(this).find(`span#total_price_${option}_${id}`).text(),
+            'total_days': $(this).find(`input[name=total_date_input ]#${option}_${id}`).val(),
+            'receive_date': $(this).find(`input[name=receive_date_input ]#${option}_${id}`).val(),
+            'return_date': $(this).find(`input[name=return_date_input ]#${option}_${id}`).val(),
+        });
+    })
+    console.log('Array: ' + JSON.stringify(arr.splice(2,arr.length)));
+})

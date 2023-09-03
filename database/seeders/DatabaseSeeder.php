@@ -51,15 +51,15 @@ class DatabaseSeeder extends Seeder
 
     public function run(): void
     {
-        Book::disableSearchSyncing();
+//        Book::disableSearchSyncing();
 
         $this->authFactory();
         $this->bookFactory();
         $this->registrationFactory();
 
         // Defines Algolia search is searchable and enables syncing
-        Book::all()->searchable();
-        Book::enableSearchSyncing();
+//        Book::all()->searchable();
+//        Book::enableSearchSyncing();
 
     }
 }

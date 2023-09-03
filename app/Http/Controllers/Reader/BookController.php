@@ -116,7 +116,7 @@ class BookController extends Controller
                 });
             })
             ->orderByDesc('id')
-            ->with('categories:id,slug,name')
+            ->with(['categories:id,slug,name', 'options'])
             ->paginate(8, ['id', 'name', 'slug', 'price', 'page', 'liked', 'image'])
             ->appends($request->query());
 
@@ -174,12 +174,11 @@ class BookController extends Controller
             ->whereHas('authors', function ($q) use ($book) {
                 $q->whereIn('id', $book->authors()->pluck('id')->toArray());
             })
-            ->with('categories')
+            ->with(['categories', 'options'])
             ->get();
 
         $cart = collect(Cookie::has('cart') ? json_decode(Cookie::get('cart'), true) : []);
         $inCart = $cart->where('id', $book->id)->pluck('option')->toArray();
-//        return $inCart;
         $data = [
             'similars' => $similars,
             'liked' => in_array($book->id, $this->getCookie('likedBooks')) ? 'text-danger' : 'text-dark',

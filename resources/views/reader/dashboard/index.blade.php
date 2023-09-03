@@ -42,8 +42,12 @@
                             <tbody>
                             @foreach($inCartBooks as $book)
                                 <tr>
+                                    <input type="hidden" name="book_option" value="{{ $book[1]['option'] }}" />
+                                    <input type="hidden" name="id" value="{{ $book[0]->id }}" />
                                     <th scope="row">{{ $loop->iteration }}</th>
-                                    <td><img src="{{ $book[0]->image() }}" class="img-fluid border rounded p-2" width="80"></td>
+                                    <td>
+                                        <img src="{{ $book[0]->image() }}" class="img-fluid border rounded p-2" width="80" />
+                                    </td>
                                     <td>
                                         <div class="d-block">
                                             @if(in_array($book[1]['option'], ['r', 'b']))
@@ -67,7 +71,7 @@
                                                     <div class="input-group">
                                                         <span id="total_days" class="input-group-text w-25 fw-semibold small-sm overflow-auto">Total: </span>
                                                         <input class="form-control form-control-sm" name="total_date_input"
-                                                        id="{{ $book[1]['option'] . '_' . $book[0]['id'] }}" type="number" value="1" min="1" max="100">
+                                                               id="{{ $book[1]['option'] . '_' . $book[0]['id'] }}" type="number" value="1" min="1" max="100">
                                                         <span id="total_price_{{ $book[1]['option'] . '_' . $book[0]['id'] }}" class="input-group-text w-50 overflow-auto" style="font-size: smaller">{{ number_format($book[1]['price'], 2) }}</span>
                                                     </div>
                                                 </div>
@@ -78,11 +82,13 @@
                                         @if($book[0]->reader_id)
                                             <div><span class="fw-semibold">@lang('lang.owner'):</span> {{ $book[0]->reader->name }}</div>
                                         @endif
-                                        <div><span class="fw-semibold">@lang('lang.title'):</span> {{ $book[0]->full_name }}</div>
+                                        <div><span class="fw-semibold">@lang('lang.title'):</span> <span id="title">{{ $book[0]->full_name }}</span></div>
                                         <div><span class="fw-semibold">@lang('lang.book-code'):</span> {{ $book[0]->book_code }}</div>
                                         <div><span class="fw-semibold">@lang('lang.pages'):</span> {{ $book[0]->page }}</div>
                                         <div><span class="fw-semibold">@lang('lang.price'):</span> <span id="price_per_day_{{ $book[1]['option'] . '_' . $book[0]['id'] }}">{{ number_format($book[1]['price'], 2) }}</span> <span class="small-sm font-monospace">TMT</span></div>
-                                        <div><span class="fw-semibold">@lang('lang.option'):</span> {{ trans('lang.' . config('settings.purchase')[$book[1]['option']]) }}</div>
+                                        <div><span class="fw-semibold">@lang('lang.option'):</span>
+                                            {{ trans('lang.' . config('settings.purchase')[$book[1]['option']]) }}
+                                        </div>
                                     </td>
                                     <td>
                                         <div class="col">
@@ -95,7 +101,7 @@
                         </table>
                     </div>
 
-                    <button type="button" class="btn btn-bd-primary w-100 text-center p-3 my-3 text-white rounded shadow-sm"
+                    <button type="button" id="checkout" class="btn btn-bd-primary w-100 text-center p-3 my-3 text-white rounded shadow-sm"
                             data-bs-toggle="modal" data-bs-target="#exampleModal">Checkout
                     </button>
                     @includeWhen(request()->routeIs('dashboard'), 'reader.dashboard.checkout')

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('book_id')->index();
             $table->foreign('book_id')->references('id')->on('books')->cascadeOnDelete();
-            $table->enum('type', ['electron', 'audiobook'])->nullable();
+/            $table->enum('type', ['electron', 'audiobook'])->nullable();
             $table->unsignedFloat('price')->default(0);
             $table->string('source');
             $table->unsignedInteger('downloaded')->default(0);

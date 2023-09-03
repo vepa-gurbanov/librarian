@@ -52,6 +52,7 @@ class DashboardController extends Controller
             ];
         }
 
+//        return $inCartBooks;
         Cookie::queue('checkout', json_encode($toCookie, JSON_UNESCAPED_UNICODE), 31 * 24 * 60);
 
         $registeredBooks = collect([]);

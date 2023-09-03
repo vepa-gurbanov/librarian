@@ -14,7 +14,8 @@ use Spatie\Translatable\HasTranslations;
 
 class Category extends Model
 {
-    use HasFactory, HasTranslations, Searchable;
+    use HasFactory, HasTranslations;
+//    use Searchable;
 
     protected $guarded = ['id', 'parent_id'];
 
