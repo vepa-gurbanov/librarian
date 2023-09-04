@@ -524,11 +524,15 @@ $('button#checkout').on('click', function (e) {
     $.each(content, function (i) {
         let option = $(this).find('input:hidden[name=book_option]').val();
         let id = $(this).find('input:hidden[name=id]').val();
+        let price = $(this).find(`span#total_price_${option}_${id}`).text() !== ""
+            ? $(this).find(`span#total_price_${option}_${id}`).text()
+            : $(this).find(`span#price_per_day_${option}_${id}`).text();
+        console.log('price: ' + $(this).find(`span#price_per_day_${option}_${id}`).text())
         arr.push({
             'id': id,
             'option': option,
             'title': $(this).find('span#title').text(),
-            'total_price': $(this).find(`span#total_price_${option}_${id}`).text(),
+            'total_price': price,
             'total_days': $(this).find(`input[name=total_date_input ]#${option}_${id}`).val(),
             'receive_date': $(this).find(`input[name=receive_date_input ]#${option}_${id}`).val(),
             'return_date': $(this).find(`input[name=return_date_input ]#${option}_${id}`).val(),

@@ -51,6 +51,7 @@ Route::controller(BookController::class)
 Route::get('shelves/{id}/books', [ShelfController::class, 'shelfBooks'])->name('shelves.books');
 Route::resource('shelves', ShelfController::class);
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+Route::get('/dashboard/checkout', [DashboardController::class, 'checkout'])->name('checkout');
 Route::get('cart', [DashboardController::class, 'cart'])->name('cart');
 Route::get('date', [DashboardController::class, 'dateControl'])->name('date');
 
